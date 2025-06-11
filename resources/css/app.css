@@ -1,0 +1,78 @@
+/* Global styles for responsiveness and alignment */
+
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.table-wrapper {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.fl-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fl-table th, .fl-table td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #0ad2ed;
+    font-size: 14px;
+}
+
+.fl-table thead th {
+    background-color: #42CCC5;
+    color: white;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.fl-table tbody tr:hover {
+    background-color: #e0f0ff;
+}
+
+/* Responsive typography and spacing */
+@media (max-width: 768px) {
+    .fl-table th, .fl-table td {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
+
+/* Sidebar toggle button for small screens */
+.sidebar-toggle-btn {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background-color: #42CCC5;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    z-index: 1100;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .sidebar-toggle-btn {
+        display: block;
+    }
+}
