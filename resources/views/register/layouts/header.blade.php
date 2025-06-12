@@ -22,8 +22,9 @@
         }
     </style>
     <div class="container">
-        <a class="navbar-brand" href="{{ route('register.attendees.index') }}">
-            CocoaSpace
+        <a class="navbar-brand d-flex align-items-center" href="{{ route('register.attendees.index') }}">
+            <img src="/images/logo.png" alt="CocoaSpace Logo" style="height: 40px; margin-right: 10px;">
+            
         </a>
         <div class="collapse navbar-collapse justify-content-end">
             <ul class="navbar-nav">

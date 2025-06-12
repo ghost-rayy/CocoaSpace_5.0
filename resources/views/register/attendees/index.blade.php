@@ -15,17 +15,15 @@
 </script>
 @endif
 
-<div class="container" style="display: flex; gap: 20px;">
-    <div style="flex: 2;">
+<div class="container" style="display: flex; gap: 20px; flex-wrap: wrap;">
+    <div style="flex: 2; min-width: 300px;">
         <h1>Approved Bookings</h1>
 
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 0px;">
-            <form action="{{ route('register.attendees.index') }}" method="GET" style="display: flex; gap: 10px;">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or e-ticket" style="padding: 8px 12px; border: 1px solid #42CCC5; border-radius: 5px;">
-                <button type="submit"
-                        style="padding: 8px 15px; background-color: #42CCC5; border: none; color: white; border-radius: 5px;">
-                    🔍 Search
-                </button>
+            <div class="search-container">
+            <form class="search-form" action="{{ route('register.attendees.index') }}" method="GET" >
+                <input class="search-input" type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or e-ticket" >
+                <button type="submit" class="search-button">🔍 Search</button>
+
             </form>
         </div>
 
@@ -59,7 +57,7 @@
                                 @endif
                             </td>
                             <td>
-                                <span class="badge bg-success">Approved</span>
+                                <span class="badge bg-success" style="padding: 10px;">Approved</span>
                             </td>
                             <td>
                                 <a href="{{ route('register.attendees.register', $booking->id) }}" class="btn">Load</a>
@@ -82,6 +80,38 @@
         </div>
     </div>
 </div>
+
+<style>
+    @media (max-width: 768px) {
+        .table-wrapper {
+            max-height: none;
+            overflow: visible;
+        }
+        .fl-table {
+            font-size: 12px;
+        }
+        .fl-table th, .fl-table td {
+            padding: 6px;
+        }
+        form[method="GET"] {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        form[method="GET"] input[type="text"], form[method="GET"] button {
+            width: 100% !important;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+
+<script>
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        const searchBar = document.getElementById('search-bar-container');
+        if (searchBar) {
+            searchBar.style.display = 'none';
+        }
+    }
+</script>
 @endsection
 
 <script>
@@ -94,6 +124,57 @@
 </script>
 
 <style>
+    .search-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .search-input {
+            padding: 12px 16px;
+            border: 2px solid #dfe6e9;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 200px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        .search-input:focus {
+            border-color: #42CCC5;
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(66, 204, 197, 0.1);
+            outline: none;
+        }
+
+        .search-button {
+            padding: 12px 20px;
+            background-color: #42CCC5;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-button:hover {
+            background-color: #1f6d69;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 204, 197, 0.3);
+        }
+        
     h1 {
         text-align: center;
         font-size: 18px;

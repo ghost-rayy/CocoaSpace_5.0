@@ -64,21 +64,8 @@ class RegisterController extends Controller
             return back()->with('error', 'Failed to register attendee.');
         }
 
-        // Send success email to attendee
-        // Mail::to($validated['email'])->send(new AttendeeRegistered($validated['name']));
-
-        // $smsMessage = "Hello {$validated['name']}, you have successfully registered for the meeting.";
-        // $this->smsService->sendSMS($validated['phone'], $smsMessage);
-
         Mail::to($validated['email'])->send(new RegistrationConfirmation($validated['name']));
 
-        // $smsMessage = "Hello {$validated['name']}, you have successfully registered for the meeting.";
-
-        // return view('registration-success', [
-        //         'phone' => $validated['phone'],
-        //         'message' => $smsMessage,
-        //         'booking_id' => $validated['booking_id'],
-        //     ]);
         return redirect()->route('register.attendees.register', $validated['booking_id'])->with('success', 'Attendee registered successfully!');
     }
 
@@ -96,7 +83,7 @@ class RegisterController extends Controller
             // Store flyer path in session for demo purposes
             session(['flyer_path' => 'flyers/' . $imageName]);
 
-            return redirect()->route('register.attendees.index')->with('success', 'Flyer uploaded successfully.');
+           return redirect()->route('register.attendees.index')->with('success', 'Flyer uploaded successfully.');
         }
 
         return back()->with('error', 'Please select a valid image file.');

@@ -25,6 +25,7 @@ class User extends Authenticatable
         'department',
         'office_number',
         'is_admin',
+        'role',
     ];
 
     /**
