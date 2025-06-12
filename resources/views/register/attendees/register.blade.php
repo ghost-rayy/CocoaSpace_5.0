@@ -33,7 +33,7 @@
     .left-illustration img {
         margin-top: -100px;
         width: 400px;
-        max-width: 90vw;
+        max-width: 100%;
         border-radius: 15px;
         /* box-shadow: 0 4px 15px rgba(0,0,0,0.1); */
     }
@@ -159,17 +159,36 @@
         color: white;
         font-size: 2.5rem;
         font-weight: 700;
-        text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+        font-size: 30px;
+        text-shadow: 2px 2px 6px rgba(72, 71, 69, 0.7);
         z-index: 10;
         user-select: none;
         text-align: center;
     }
 </style>
 
-<div class="main-content">
+<style>
+    .maximized {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 9999 !important;
+        background-color: white !important;
+        display: flex !important;
+        flex-direction: row !important;
+        overflow: hidden !important;
+    }
+</style>
+
+<div class="main-content" id="mainContent">
+    <button id="maximizeBtn" title="Maximize" style="position: fixed; top: 10px; right: 10px; z-index: 10000; background-color: #42CCC5; border: none; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+        ⬜
+    </button>
     <div class="left-illustration" style="position: relative; flex-direction: column; display: flex; align-items: center;">
         <h1 class="system-name">WELCOME TO COCOA BOARD MEETING MANAGEMENT SYSTEM</h1>
-        <div class="image-container" style="position: relative; width: 400px; height: 250px; margin-top: 130px; margin-bottom: 0px;">
+        <div class="image-container" style="position: relative; width: 400px; height: 350px; margin-top: 250px; margin-bottom: -50px;">
             @if($bookings->flyer_path)
                 <img src="{{ asset($bookings->flyer_path) }}" alt="Programme Flyer" style="max-width: 100%; max-height: 100%; object-fit: contain;">
             @else
@@ -180,8 +199,8 @@
         <div style="color: white; font-weight: 600; font-size: 18px; text-shadow: 1px 1px 3px rgba(0,0,0,0.7); text-align: center;">
             <h2>{{ $bookings->requester }}</h2>
         </div>
-        <div style="color: white; text-align: center; background-color:#42CCC5; padding:5px; border-radius:15px;">
-            <h2 style="font-size: 15px;">{{ $bookings->meetingRoom->name}} | {{ $bookings->time}}</h2>
+        <div style="color: white; text-align: center; background-color:#42CCC5; padding:7px; border-radius:15px; letter-spacing:2px; background-color:#fff; color:#1f6d69;">
+            <h2 style="font-size: 15px; margin-top:7px; font-weight:bolder;">{{ $bookings->meetingRoom->name}} | {{ $bookings->meetingRoom->room_number }} | {{ $bookings->time}} </h2>
         </div>
     </div>
     <div class="form-section">
@@ -224,4 +243,54 @@
         </div>
     </div>
 </div>
+
+<script>
+    function applyMaximizeState() {
+        const mainContent = document.getElementById('mainContent');
+        const navbar = document.querySelector('nav.navbar');
+        const btn = document.getElementById('maximizeBtn');
+        const isMaximized = localStorage.getItem('isMaximized') === 'true';
+
+        if (isMaximized) {
+            mainContent.classList.add('maximized');
+            if (navbar) {
+                navbar.style.display = 'none';
+            }
+            btn.textContent = '❐'; // Restore icon
+        } else {
+            mainContent.classList.remove('maximized');
+            if (navbar) {
+                navbar.style.display = '';
+            }
+            btn.textContent = '⬜'; // Maximize icon
+        }
+    }
+
+    document.getElementById('maximizeBtn').addEventListener('click', function() {
+        const mainContent = document.getElementById('mainContent');
+        const navbar = document.querySelector('nav.navbar');
+        const btn = this;
+
+        if (!mainContent.classList.contains('maximized')) {
+            mainContent.classList.add('maximized');
+            if (navbar) {
+                navbar.style.display = 'none';
+            }
+            btn.textContent = '❐'; // Restore icon
+            localStorage.setItem('isMaximized', 'true');
+        } else {
+            mainContent.classList.remove('maximized');
+            if (navbar) {
+                navbar.style.display = '';
+            }
+            btn.textContent = '⬜'; // Maximize icon
+            localStorage.setItem('isMaximized', 'false');
+        }
+    });
+
+    // Apply maximize state on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        applyMaximizeState();
+    });
+</script>
 @endsection

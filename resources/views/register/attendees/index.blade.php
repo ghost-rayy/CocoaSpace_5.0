@@ -60,12 +60,14 @@
                                 <span class="badge bg-success" style="padding: 10px;">Approved</span>
                             </td>
                             <td>
-                                <a href="{{ route('register.attendees.register', $booking->id) }}" class="btn">Load</a>
-                                <form action="{{ route('register.attendees.uploadFlyerForBooking', $booking->id) }}" method="POST" enctype="multipart/form-data" style="display:inline-block; margin-left: 10px;">
-                                    @csrf
-                                    <input type="file" name="flyer" accept="image/*" required style="display: inline-block; width: 120px; padding: 3px;">
-                                    <button type="submit" class="btn" style="padding: 5px 10px; margin-left: 5px;">Upload Flyer</button>
-                                </form>
+                                <div class="action-buttons">
+                                    <a style="background-color: #1f6d69; color:white;" href="{{ route('register.attendees.register', $booking->id) }}" class="btn">Load</a>
+                                    <form action="{{ route('register.attendees.uploadFlyerForBooking', $booking->id) }}" method="POST" enctype="multipart/form-data" class="upload-flyer-form">
+                                        @csrf
+                                        <input type="file" name="flyer" accept="image/*" required id="flyer-{{ $booking->id }}" class="file-input">
+                                        <label for="flyer-{{ $booking->id }}" class="file-label">Upload Flyer</label>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -227,15 +229,7 @@
     }
 
     .btn:hover{
-        color: #fcfcfc;
-        background-color: #1f6d69;
-    }
-
-    .btn{
-        text-decoration: none; 
-        background-color:#42CCC5; 
-        padding:5px; 
-        color:white;
+        background-color: #42CCC5;
     }
 
     /* Responsive Fixes */
@@ -246,4 +240,67 @@
         }
     }
 </style>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.file-input').forEach(function(input) {
+            input.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    this.closest('form').submit();
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .upload-flyer-form {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        margin: 0;
+        background-color: #1f6d69;
+        border-radius: 8px;
+    }
+
+    .file-label {
+        color: white;
+        padding:8px;
+        cursor: hand;
+        border-radius: 8px;
+    }
+
+    .file-label:hover{
+        background-color: #42CCC5
+    }
+
+    .file-input {
+        display: none;
+    }
+
+    @media (max-width: 480px) {
+        .action-buttons {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .upload-flyer-form {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .file-label, .upload-btn, .btn {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
 @include('register.layouts.footer')
