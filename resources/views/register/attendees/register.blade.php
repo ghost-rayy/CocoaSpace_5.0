@@ -31,7 +31,7 @@
         margin-left: 20px;
     }
     .left-illustration img {
-        margin-top: -100px;
+        margin-top: -150px;
         width: 400px;
         max-width: 100%;
         border-radius: 15px;
@@ -57,10 +57,12 @@
         padding: 40px 32px 32px 32px;
         border-radius: 24px;
         background: #fff;
-        box-shadow: 0 2px 8px rgba(9, 9, 9, 0.1);
+        /* box-shadow: 0 2px 8px rgba(9, 9, 9, 0.1); */
         display: flex;
         flex-direction: column;
         align-items: center;
+        height:550px;
+        margin-top: -100px;
     }
     .register-title {
         color: #42CCC5;
@@ -69,18 +71,20 @@
         margin-bottom: 8px;
         text-align: center;
         margin-top: -45px;
+        text-transform: uppercase;
     }
     .register-subtext {
         color: #888;
         font-size: 1rem;
-        margin-bottom: 28px;
+        margin-bottom: 50px;
         text-align: center;
+        margin-top: 30px;
     }
     .register-form {
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        gap: 25px;
     }
     .register-input, .register-form select {
         width: 100%;
@@ -114,18 +118,7 @@
     .register-btn:hover {
         background: #1f6d69;
     }
-    .login-link {
-        color: #42CCC5;
-        font-size: 0.95rem;
-        text-align: center;
-        text-decoration: none;
-        margin-top: 18px;
-        display: block;
-        transition: color 0.2s;
-    }
-    .login-link:hover {
-        color: #1f6d69;
-    }
+
     @media (max-width: 900px) {
         .main-content {
             flex-direction: column;
@@ -140,10 +133,26 @@
             box-shadow: none;
             height: calc(100vh - 64px);
             padding: 24px 0;
-            margin: 0 10px;
         }
     }
     @media (max-width: 600px) {
+        .main-content {
+            margin-top: 54px;
+        }
+        .register-card {
+            padding: 24px 4px 16px 4px;
+            border-radius: 12px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .header {
+            padding: 0 12px;
+            height: 54px;
+        }
+        .header-logo {
+            height: 34px;
+        }
         .main-content {
             margin-top: 54px;
         }
@@ -188,7 +197,7 @@
     </button>
     <div class="left-illustration" style="position: relative; flex-direction: column; display: flex; align-items: center;">
         <h1 class="system-name">WELCOME TO COCOA BOARD MEETING MANAGEMENT SYSTEM</h1>
-        <div class="image-container" style="position: relative; width: 400px; height: 350px; margin-top: 250px; margin-bottom: -50px;">
+        <div class="image-container" style="position: relative; width: 400px; height: 350px; margin-top: 250px; margin-bottom: -150px;">
             @if($bookings->flyer_path)
                 <img src="{{ asset($bookings->flyer_path) }}" alt="Programme Flyer" style="max-width: 100%; max-height: 100%; object-fit: contain;">
             @else
@@ -199,7 +208,7 @@
         <div style="color: white; font-weight: 600; font-size: 18px; text-shadow: 1px 1px 3px rgba(0,0,0,0.7); text-align: center;">
             <h2>{{ $bookings->requester }}</h2>
         </div>
-        <div style="color: white; text-align: center; background-color:#42CCC5; padding:7px; border-radius:15px; letter-spacing:2px; background-color:#fff; color:#1f6d69;">
+        <div style="color: white; text-align: center; background-color:#42CCC5; padding:7px; border-radius:25px; padding-left:15px; padding-right:15px; letter-spacing:2px; background-color:#fff; color:#1f6d69;">
             <h2 style="font-size: 15px; margin-top:7px; font-weight:bolder;">{{ $bookings->meetingRoom->name}} | {{ $bookings->meetingRoom->room_number }} | {{ $bookings->time}} </h2>
         </div>
     </div>

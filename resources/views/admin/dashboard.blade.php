@@ -318,31 +318,107 @@
         width: 100%;
         height: 100%;
         overflow: auto;
-        background-color: rgba(0,0,0,0.7);
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        transition: opacity 0.3s ease;
     }
 
     .modal-content {
-        background-color: #fefefe;
-        margin: 10% auto;
-        padding: 20px;
-        border: 1px solid #888;
+        background-color: #ffffff;
+        margin: 8% auto;
+        padding: 30px 40px;
+        border-radius: 12px;
         width: 400px;
-        max-width: 30%;
-        border-radius: 8px;
+        max-width: 90%;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        animation: slideDown 0.4s ease forwards;
+        position: relative;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .close {
-        color: #aaa;
-        float: right;
+        color: #888;
+        position: absolute;
+        top: 15px;
+        right: 20px;
         font-size: 28px;
-        font-weight: bold;
+        font-weight: 700;
         cursor: pointer;
+        transition: color 0.3s ease;
     }
 
     .close:hover,
     .close:focus {
-        color: black;
+        color: #42CCC5;
         text-decoration: none;
+    }
+
+    /* Form inside modal */
+    .modal-content h2 {
+        margin-bottom: 25px;
+        font-weight: 700;
+        color: #333;
+        text-align: center;
+        font-size: 24px;
+    }
+
+    .modal-content label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #555;
+        font-size: 14px;
+    }
+
+    .modal-content input[type="text"],
+    .modal-content input[type="email"],
+    .modal-content input[type="password"],
+    .modal-content select {
+        width: 100%;
+        padding: 10px 12px;
+        margin-bottom: 20px;
+        border: 1.8px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+        transition: border-color 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .modal-content input[type="text"]:focus,
+    .modal-content input[type="email"]:focus,
+    .modal-content input[type="password"]:focus,
+    .modal-content select:focus {
+        border-color: #42CCC5;
+        outline: none;
+        box-shadow: 0 0 8px rgba(66, 204, 197, 0.5);
+    }
+
+    .modal-content button[type="submit"] {
+        width: 100%;
+        background-color: #42CCC5;
+        color: white;
+        padding: 12px 0;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .modal-content button[type="submit"]:hover {
+        background-color: #36b3ad;
     }
 </style>
 
