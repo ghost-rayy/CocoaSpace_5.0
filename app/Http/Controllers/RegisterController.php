@@ -65,6 +65,7 @@ class RegisterController extends Controller
         }
 
         Mail::to($validated['email'])->send(new RegistrationConfirmation($validated['name']));
+        // Mail::to($validated['email'])->queue(new RegistrationConfirmation($validated['name']));
 
         return redirect()->route('register.attendees.register', $validated['booking_id'])->with('success', 'Attendee registered successfully!');
     }

@@ -30,6 +30,7 @@
                     <th>Email</th>
                     <th>Department / Company</th>
                     <th>Phone</th>
+                    <th>Registration Time</th>
                 </tr>
             </thead>
             <tbody>
@@ -40,6 +41,7 @@
                         <td>{{ $attendee->email }}</td>
                         <td>{{ $attendee->department }}</td>
                         <td>{{ $attendee->phone }}</td>
+                        <td>{{ $attendee->created_at->format('Y-m-d H:i:s') }}</td>
                     </tr>
                 @endforeach
             </tbody>

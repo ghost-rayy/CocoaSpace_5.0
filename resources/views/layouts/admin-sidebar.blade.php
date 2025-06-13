@@ -12,6 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <title>CocoaSpace</title>
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ENjdO4Dr2bkBIFxQpeoYz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous">
+
     <style>
         *{
             padding: 0;
@@ -118,6 +120,7 @@
             border-top-left-radius: 2rem;
             /* border: 1px solid red; */
         }
+
         .options li a {
             text-decoration: none;
             color: rgb(255, 255, 255);
@@ -140,6 +143,75 @@
 
         .options li:hover a {
             color: #42ccc5;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <style>
+        /* Responsive styles */
+        @media (max-width: 1024px) {
+            .content {
+                display: grid;
+                grid-template-columns: 80px 1fr;
+                grid-template-rows: auto;
+                grid-template-areas: "sidebar main";
+                min-height: 100vh;
+            }
+            .sidebar {
+                grid-area: sidebar;
+                width: 190px;
+                height: 100vh;
+                position: sticky;
+                top: 0;
+                margin-top: 0;
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+                white-space: normal;
+            }
+            .sidebar ul.options {
+                display: flex;
+                flex-direction: column;
+                padding: 0;
+                margin: 0;
+                width: 100%;
+            }
+            .sidebar ul.options li {
+                margin: 0;
+                border-radius: 0;
+                border-bottom-left-radius: 0;
+                border-top-left-radius: 0;
+            }
+            .main {
+                grid-area: main;
+                width: auto;
+                margin-top: 100;
+                height: auto !important;
+                min-height: auto !important;
+                max-height: auto;
+                padding: 1rem;
+                margin-left: 50px;
+            }
+        }
+        @media (max-width: 600px) {
+            .sidebar ul.options li a {
+                font-size: 14px;
+                padding: 0.5rem 0.75rem;
+            }
+            .admin {
+                font-size: 16px;
+                margin-top: 1rem;
+            }
+            .head {
+                flex-direction: column;
+                height: auto;
+                padding: 1rem 0.5rem;
+            }
+            .logo img {
+                width: 150%;
+                height: auto;
+                margin-top: 10px;
+            }
         }
     </style>
 </head>

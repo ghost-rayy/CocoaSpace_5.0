@@ -42,11 +42,11 @@
                     <td>{{ $room->floor }}</td>
                     <td>{{ $room->capacity }}</td>
                     <td>
-                        <a href="{{ route('admin.meeting_rooms.edit', $room->id) }}" class="btn btn-warning">Edit</a>
+                        <button class="btn btn-warning edit-room-btn" style="padding:5px; background-color:#42CCC5; text-decoration:none; color:white; border:none;" data-id="{{ $room->id }}" data-name="{{ $room->name }}" data-room_number="{{ $room->room_number }}" data-floor="{{ $room->floor }}" data-capacity="{{ $room->capacity }}">Edit</button>
                         <form action="{{ route('admin.meeting_rooms.destroy', $room->id) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger delete-room-btn">Delete</button>
+                            <button style="padding:5px; background-color:#42CCC5; text-decoration:none; color:white; border:none;" type="submit" class="btn btn-danger delete-room-btn">Delete</button>
                         </form>
                     </td>
                 </tr>
@@ -85,6 +85,75 @@
         </form>
     </div>
 </div>
+
+<!-- Modal structure for Edit Meeting Room -->
+<div id="editRoomModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="editModalClose">&times;</span>
+        <h2>Edit Meeting Room</h2>
+
+        <form id="editRoomForm" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="mb-3">
+                <label for="editName" class="form-label">Room Name</label>
+                <input type="text" id="editName" name="name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="editRoomNumber" class="form-label">Room Number</label>
+                <input type="text" id="editRoomNumber" name="room_number" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="editFloor" class="form-label">Floor</label>
+                <input type="text" id="editFloor" name="floor" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="editCapacity" class="form-label">Capacity</label>
+                <input type="number" id="editCapacity" name="capacity" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-success">Update</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var editModal = document.getElementById("editRoomModal");
+        var editForm = document.getElementById("editRoomForm");
+        var editModalClose = document.getElementById("editModalClose");
+
+        // Open edit modal and populate form fields
+        document.querySelectorAll('.edit-room-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var roomId = this.getAttribute('data-id');
+                var name = this.getAttribute('data-name');
+                var roomNumber = this.getAttribute('data-room_number');
+                var floor = this.getAttribute('data-floor');
+                var capacity = this.getAttribute('data-capacity');
+
+                editForm.action = '/admin/meeting-rooms/' + roomId + '/update';
+                editForm.querySelector('#editName').value = name;
+                editForm.querySelector('#editRoomNumber').value = roomNumber;
+                editForm.querySelector('#editFloor').value = floor;
+                editForm.querySelector('#editCapacity').value = capacity;
+
+                editModal.style.display = "block";
+            });
+        });
+
+        // Close edit modal
+        editModalClose.onclick = function() {
+            editModal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == editModal) {
+                editModal.style.display = "none";
+            }
+        }
+    });
+</script>
 @endsection
 
 <style>

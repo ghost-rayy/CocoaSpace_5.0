@@ -39,7 +39,7 @@
                     <th>Date</th>
                     <th>Time</th>
                     <th>Room</th>
-                    <th>E-Ticket</th>
+                    <th>Meeting ID</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>

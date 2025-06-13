@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\MeetingAttendee;
 use App\Models\MeetingRoom;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RegistrationConfirmation;
+use App\Mail\AttendeeRegistered;
 
 class MeetingAttendeeController extends Controller
 {
@@ -39,6 +41,7 @@ class MeetingAttendeeController extends Controller
             'email' => 'required|email',
             'department' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
+            'registration_time' => 'required|date',
         ]);
 
         $attendee = MeetingAttendee::create([
@@ -48,12 +51,15 @@ class MeetingAttendeeController extends Controller
             'email' => $validated['email'],
             'department' => $validated['department'],
             'phone' => $validated['phone'],
+            'created_at' => $validated['registration_time'],
+            'updated_at' => $validated['registration_time'],
         ]);
 
         if (!$attendee) {
             return back()->with('error', 'Failed to register attendee.');
         }
 
+        Mail::to($validated['email'])->send(new RegistrationConfirmation($validated['name']));  
 
         $bookings = Booking::with('meetingRoom')->get();
 

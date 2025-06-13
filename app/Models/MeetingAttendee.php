@@ -9,7 +9,7 @@ class MeetingAttendee extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['booking_id', 'name', 'gender', 'email', 'department', 'phone'];
+    protected $fillable = ['booking_id', 'name', 'gender', 'email', 'department', 'phone', 'created_at', 'updated_at'];
 
     public function booking()
     {

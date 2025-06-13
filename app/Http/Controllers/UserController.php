@@ -15,7 +15,7 @@ class UserController extends Controller
 {
     public function sdash()
     {
-        return view('user.dashboard');
+        return view('user.create-booking');
     }
 
     public function createBooking(){

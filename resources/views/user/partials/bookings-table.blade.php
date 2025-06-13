@@ -14,7 +14,7 @@
                 <th>Reason</th>
                 <th>Capacity</th>
                 <th>Status</th>
-                <th>E-Ticket</th>
+                <th>Meeting ID</th>
             </tr>
         </thead>
         <tbody>

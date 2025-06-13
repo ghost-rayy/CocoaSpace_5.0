@@ -51,15 +51,39 @@
                         <td>{{ $user->is_admin ? 'Admin' : 'Staff' }}</td>
                         <td>
                             <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
+                            {{-- <button style="padding:5px; background-color:#42CCC5; text-decoration:none; color:white; border:none;" type="button" class="btn btn-primary btn-sm edit-user-btn" data-user-id="{{ $user->id }}" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
                                 Edit
-                            </button>
+                            </button> --}}
 
-                            <button class="btn btn-danger btn-sm delete-user" data-id="{{ $user->id }}">Delete</button>
+                            <button class="btn btn-danger btn-sm delete-user" data-id="{{ $user->id }}" style="padding:5px; background-color:#42CCC5; text-decoration:none; color:white; border:none;">Delete</button>
                             <form id="delete-form-{{ $user->id }}" action="{{ route('admin.users-destroy', $user->id) }}" method="POST" style="display: none;">
                                 @csrf
                                 @method('DELETE')
                             </form>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const deleteButtons = document.querySelectorAll('.delete-user');
+                                    deleteButtons.forEach(button => {
+                                        button.addEventListener('click', function () {
+                                            const userId = this.getAttribute('data-id');
+                                            Swal.fire({
+                                                title: 'Are you sure?',
+                                                text: "This action cannot be undone.",
+                                                icon: 'warning',
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#3085d6',
+                                                cancelButtonColor: '#d33',
+                                                confirmButtonText: 'Yes, delete it!'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    document.getElementById('delete-form-' + userId).submit();
+                                                }
+                                            });
+                                        });
+                                    });
+                                });
+                            </script>
 
                             <!-- Modal -->
                             <div class="modal fade" id="editUserModal{{ $user->id }}" tabindex="-1" aria-labelledby="editUserModalLabel{{ $user->id }}" aria-hidden="true">
@@ -76,11 +100,6 @@
                                         <div class="mb-3">
                                             <label for="name{{ $user->id }}" class="form-label">Name</label>
                                             <input type="text" id="name{{ $user->id }}" name="name" class="form-control" value="{{ $user->name }}" required>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="email{{ $user->id }}" class="form-label">Email</label>
-                                            <input type="email" id="email{{ $user->id }}" name="email" class="form-control" value="{{ $user->email }}" required>
                                         </div>
 
                                         <div class="mb-3">
@@ -245,8 +264,24 @@
 
             <button type="submit" class="btn btn-primary" style="padding: 8px 15px; background-color: #42CCC5; border: none; color: white; border-radius: 5px; cursor: hand;">Add User</button>
         </form>
-    </div>
+                            </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.edit-user-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var userId = this.getAttribute('data-user-id');
+                var modalId = '#editUserModal' + userId;
+                var modalElement = document.querySelector(modalId);
+                if (modalElement) {
+                    var modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                }
+            });
+        });
+    });
+</script>
 
 @endsection
 

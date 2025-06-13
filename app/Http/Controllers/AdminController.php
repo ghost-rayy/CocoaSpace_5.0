@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Events\BookingRequested;
-
+use App\Mail\AttendeeRegistered;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RegistrationConfirmation;
 
 
 class AdminController extends Controller
