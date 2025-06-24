@@ -30,5 +30,24 @@
         <button type="submit" class="btn btn-success">Save</button>
     </form>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var roomForm = document.querySelector('form[action="{{ route('admin.storeRoom') }}"]');
+    if (roomForm) {
+        roomForm.addEventListener('submit', function(e) {
+            Swal.fire({
+                title: 'Adding meeting room...',
+                text: 'Please wait while we add the meeting room.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        });
+    }
+});
+</script>
 @endsection
 

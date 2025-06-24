@@ -3,8 +3,8 @@
 @section('content')
     <div class="container">
         <h1 style="font-weight:bolder; text-transform:uppercase; text-align:center;">Booking History</h1>
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 0px;">
-            <form action="{{ route('admin.bookings.history') }}" method="GET" style="display: flex; gap: 10px;">
+        <div style="width:100%; display: flex; justify-content: flex-end; margin-bottom: 0px;">
+            <form action="{{ route('admin.bookings.history') }}" method="GET" class="search-bar-responsive" style="display: flex; gap: 10px;">
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or e-ticket" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 5px;">
                 <button type="submit"
                         style="padding: 8px 15px; background-color: #42CCC5; border: none; color: white; border-radius: 5px;">
@@ -13,7 +13,7 @@
             </form>
         </div>
 
-        <div class="table-wrapper">
+        <div class="table-responsive"><div class="table-wrapper" style="overflow-x:auto;">
             <table class="fl-table">
                 <thead>
                     <tr>
@@ -70,7 +70,7 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
+        </div></div>
     </div>
 @endsection
 
@@ -96,14 +96,14 @@
         background-color: #42CCC5;
         color: white;
         font-weight: bold;
-        text-align: center;
+        text-align: left;
         padding: 12px;
         z-index: 2;
     }
 
     .fl-table th, .fl-table td {
         padding: 10px;
-        text-align: center;
+        text-align: left;
         border-bottom: 1px solid #ddd;
         font-size: 14px;
     }
@@ -118,9 +118,31 @@
 
     /* Optional: Improve responsiveness */
     @media (max-width: 768px) {
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .table-responsive table {
+            min-width: 600px;
+        }
         .fl-table th, .fl-table td {
             font-size: 12px;
             padding: 8px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .search-bar-responsive {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            width: 100% !important;
+        }
+        .search-bar-responsive input[type="text"] {
+            width: 100% !important;
+            margin-bottom: 8px !important;
+        }
+        .search-bar-responsive button[type="submit"] {
+            width: 100% !important;
         }
     }
 </style>

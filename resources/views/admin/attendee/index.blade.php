@@ -19,7 +19,7 @@
 @endif
 
 <div class="container">
-    <h1>Approved Bookings</h1>
+    <h1>Register Attendees</h1>
 
     <div style="display: flex; justify-content: flex-end; margin-bottom: 0px;">
         <form action="{{ route('admin.registration') }}" method="GET" style="display: flex; gap: 10px;">
@@ -31,7 +31,7 @@
         </form>
     </div>
 
-    <div class="table-wrapper">
+    <div class="table-responsive"><div class="table-wrapper" style="overflow-x:auto;">
         <table class="fl-table">
             <thead>
                 <tr>
@@ -67,8 +67,8 @@
                             <span class="badge bg-success">Approved</span>
                         </td>
                         <td>
-                            <a href="{{ route('admin.attendees.register', $booking->id) }}" class="btn">Load</a>
-                            <a href="{{ route('admin.attendees.view', $booking->id) }}" class="btn">View Attendance</a>
+                            <a href="{{ route('admin.attendees.register', $booking->id) }}" class="btns">Load</a>
+                            <a href="{{ route('admin.attendees.view', $booking->id) }}" class="btns">View Attendance</a>
                         </td>
                     </tr>
                 @empty
@@ -80,7 +80,7 @@
                 @endforelse
             </tbody>
         </table>
-    </div>
+    </div></div>
 </div>
 @endsection
 
@@ -91,6 +91,23 @@
             alert("E-Ticket copied!");
         });
     }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('form').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Please wait while we process your request.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        });
+    });
+});
 </script>
 
 <style>
@@ -124,14 +141,14 @@
         background-color: #42CCC5;
         color: white;
         font-weight: bold;
-        text-align: center;
+        text-align: left;
         padding: 12px;
         z-index: 2;
     }
 
     .fl-table th, .fl-table td {
         padding: 10px;
-        text-align: center;
+        text-align: left;
         border-bottom: 1px solid #ddd;
         font-size: 14px;
         text-transform: uppercase;
@@ -145,12 +162,12 @@
         background-color: #e0f0ff;
     }
 
-    .btn:hover{
+    .btns:hover{
         color: #fcfcfc;
         background-color: #1f6d69;
     }
 
-    .btn{
+    .btns{
         text-decoration: none; 
         background-color:#42CCC5; 
         padding:5px; 
@@ -159,9 +176,111 @@
 
     /* Responsive Fixes */
     @media (max-width: 768px) {
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .table-responsive table {
+            min-width: 600px;
+        }
         .fl-table th, .fl-table td {
             font-size: 12px;
             padding: 8px;
         }
     }
 </style>
+
+<!-- Bulk Register Modal -->
+<div id="bulkRegisterModal" class="modal" style="display:none; position:fixed; z-index:2000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+  <div class="modal-content" style="background:#fff; padding:30px 24px; border-radius:12px; width:95%; max-width:500px; position:relative;">
+    <span class="close" id="closeBulkModalBtn" style="position:absolute; top:10px; right:18px; font-size:28px; font-weight:700; cursor:pointer;">&times;</span>
+    <h2 style="margin-bottom:18px;">Bulk Register Attendees</h2>
+    <form id="bulkRegisterForm">
+      <input type="hidden" name="booking_id" id="bulk_booking_id">
+      <div id="attendeesFields">
+        <div class="attendee-row" style="display:flex; gap:8px; margin-bottom:10px;">
+          <input type="text" name="names[]" placeholder="Name" class="form-control" required style="flex:1;">
+          <input type="email" name="emails[]" placeholder="Email" class="form-control" required style="flex:1;">
+          <button type="button" class="remove-attendee" style="background:#ff0303; color:#fff; border:none; border-radius:4px; padding:0 8px;">-</button>
+        </div>
+      </div>
+      <button type="button" id="addAttendeeBtn" style="background:#42CCC5; color:#fff; border:none; border-radius:4px; padding:4px 12px; margin-bottom:12px;">+ Add More</button>
+      <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Register & Send Codes</button>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Open modal
+  document.querySelectorAll('.open-bulk-modal').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.getElementById('bulkRegisterModal').style.display = 'flex';
+      document.getElementById('bulk_booking_id').value = this.getAttribute('data-booking-id');
+    });
+  });
+  // Close modal
+  document.getElementById('closeBulkModalBtn').onclick = function() {
+    document.getElementById('bulkRegisterModal').style.display = 'none';
+  };
+  window.onclick = function(event) {
+    if (event.target == document.getElementById('bulkRegisterModal')) {
+      document.getElementById('bulkRegisterModal').style.display = 'none';
+    }
+  };
+  // Add attendee row
+  document.getElementById('addAttendeeBtn').onclick = function() {
+    const row = document.createElement('div');
+    row.className = 'attendee-row';
+    row.style = 'display:flex; gap:8px; margin-bottom:10px;';
+    row.innerHTML = `<input type="text" name="names[]" placeholder="Name" class="form-control" required style="flex:1;">
+      <input type="email" name="emails[]" placeholder="Email" class="form-control" required style="flex:1;">
+      <button type="button" class="remove-attendee" style="background:#ff0303; color:#fff; border:none; border-radius:4px; padding:0 8px;">-</button>`;
+    document.getElementById('attendeesFields').appendChild(row);
+    row.querySelector('.remove-attendee').onclick = function() {
+      row.remove();
+    };
+  };
+  // Remove attendee row
+  document.querySelectorAll('.remove-attendee').forEach(function(btn) {
+    btn.onclick = function() {
+      btn.parentElement.remove();
+    };
+  });
+  // AJAX submit
+  document.getElementById('bulkRegisterForm').onsubmit = function(e) {
+    e.preventDefault();
+    const form = this;
+    const data = new FormData(form);
+    Swal.fire({
+      title: 'Registering...',
+      text: 'Attendees are being registered and codes will be sent in the background.',
+      allowOutsideClick: false,
+      didOpen: () => { Swal.showLoading(); }
+    });
+    fetch('/admin/attendees/bulk-register', {
+      method: 'POST',
+      headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      body: data
+    })
+    .then(response => response.json())
+    .then(res => {
+      Swal.close();
+      if(res.success) {
+        Swal.fire('Success', res.message, 'success');
+        document.getElementById('bulkRegisterModal').style.display = 'none';
+        form.reset();
+        document.getElementById('attendeesFields').innerHTML = `<div class="attendee-row" style="display:flex; gap:8px; margin-bottom:10px;"><input type="text" name="names[]" placeholder="Name" class="form-control" required style="flex:1;"><input type="email" name="emails[]" placeholder="Email" class="form-control" required style="flex:1;"><button type="button" class="remove-attendee" style="background:#ff0303; color:#fff; border:none; border-radius:4px; padding:0 8px;">-</button></div>`;
+      } else {
+        Swal.fire('Error', res.message || 'Something went wrong.', 'error');
+      }
+    })
+    .catch(() => {
+      Swal.close();
+      Swal.fire('Error', 'Something went wrong.', 'error');
+    });
+  };
+});
+</script>

@@ -1,309 +1,3 @@
-{{-- @extends('register.layouts.app')
-@section('content')
-
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: 'Poppins', sans-serif;
-    }
-    body, html {
-        height: 100%;
-        width: 100%;
-        background: #f8f9fa;
-        overflow: hidden;
-    }
-    .main-content {
-        display: flex;
-        height: 85vh;
-        overflow: hidden;
-    }
-    .left-illustration {
-        flex: 1.2;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #42CCC5;
-        border-radius: 15px 0 0 15px;
-        margin-left: 20px;
-    }
-    .left-illustration img {
-        margin-top: -150px;
-        width: 400px;
-        max-width: 100%;
-        border-radius: 15px;
-        /* box-shadow: 0 4px 15px rgba(0,0,0,0.1); */
-    }
-    .form-section {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #fff;
-        border-radius: 0 15px 15px 0;
-        box-shadow: 0 8px 32px rgba(66,204,197,0.10);
-        height: 100%;
-        overflow-y: auto;
-        padding: 40px 0;
-        margin-right: 20px;
-        margin-top: 0px;
-    }
-    .register-card {
-        width: 100%;
-        max-width: 550px;
-        padding: 40px 32px 32px 32px;
-        border-radius: 24px;
-        background: #fff;
-        /* box-shadow: 0 2px 8px rgba(9, 9, 9, 0.1); */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        height:550px;
-        margin-top: -100px;
-    }
-    .register-title {
-        color: #42CCC5;
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 8px;
-        text-align: center;
-        margin-top: -45px;
-        text-transform: uppercase;
-    }
-    .register-subtext {
-        color: #888;
-        font-size: 1rem;
-        margin-bottom: 50px;
-        text-align: center;
-        margin-top: 30px;
-    }
-    .register-form {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 25px;
-    }
-    .register-input, .register-form select {
-        width: 100%;
-        padding: 14px 16px;
-        border: 1.5px solid #e0e0e0;
-        border-radius: 12px;
-        font-size: 1rem;
-        background: #fafbfc;
-        color: #222;
-        outline: none;
-        transition: border 0.2s;
-    }
-    .register-input:focus {
-        border: 1.5px solid #42CCC5;
-        background: #fff;
-    }
-    .register-btn {
-        width: 100%;
-        background: #42CCC5;
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        padding: 14px 0;
-        font-size: 1.1rem;
-        font-weight: 600;
-        cursor: pointer;
-        margin-top: 8px;
-        transition: background 0.2s, box-shadow 0.2s;
-        box-shadow: 0 2px 8px rgba(66,204,197,0.10);
-    }
-    .register-btn:hover {
-        background: #1f6d69;
-    }
-
-    @media (max-width: 900px) {
-        .main-content {
-            flex-direction: column;
-            height: auto;
-            margin-top: 64px;
-        }
-        .left-illustration {
-            display: none;
-        }
-        .form-section {
-            border-radius: 0;
-            box-shadow: none;
-            height: calc(100vh - 64px);
-            padding: 24px 0;
-        }
-    }
-    @media (max-width: 600px) {
-        .main-content {
-            margin-top: 54px;
-        }
-        .register-card {
-            padding: 24px 4px 16px 4px;
-            border-radius: 12px;
-        }
-    }
-
-    @media (max-width: 600px) {
-        .header {
-            padding: 0 12px;
-            height: 54px;
-        }
-        .header-logo {
-            height: 34px;
-        }
-        .main-content {
-            margin-top: 54px;
-        }
-        .register-card {
-            padding: 24px 4px 16px 4px;
-            border-radius: 12px;
-        }
-    }
-    .system-name {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        color: white;
-        font-size: 2.5rem;
-        font-weight: 700;
-        font-size: 30px;
-        text-shadow: 2px 2px 6px rgba(72, 71, 69, 0.7);
-        z-index: 10;
-        user-select: none;
-        text-align: center;
-    }
-</style>
-
-<style>
-    .maximized {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        z-index: 9999 !important;
-        background-color: white !important;
-        display: flex !important;
-        flex-direction: row !important;
-        overflow: hidden !important;
-    }
-</style>
-
-<div class="main-content" id="mainContent">
-    <button id="maximizeBtn" title="Maximize" style="position: fixed; top: 10px; right: 10px; z-index: 10000; background-color: #42CCC5; border: none; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
-        ⬜
-    </button>
-    <div class="left-illustration" style="position: relative; flex-direction: column; display: flex; align-items: center;">
-        <h1 class="system-name">WELCOME TO COCOA BOARD MEETING MANAGEMENT SYSTEM</h1>
-        <div class="image-container" style="position: relative; width: 400px; height: 350px; margin-top: 250px; margin-bottom: -150px;">
-            @if($bookings->flyer_path)
-                <img src="{{ asset($bookings->flyer_path) }}" alt="Programme Flyer" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-            @else
-                <img src="{{ asset('images/meet.png') }}" alt="Meeting Illustration" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-            @endif
-        </div>
-
-        <div style="color: white; font-weight: 600; font-size: 18px; text-shadow: 1px 1px 3px rgba(0,0,0,0.7); text-align: center;">
-            <h2>{{ $bookings->requester }}</h2>
-        </div>
-        <div style="color: white; text-align: center; background-color:#42CCC5; padding:7px; border-radius:25px; padding-left:15px; padding-right:15px; letter-spacing:2px; background-color:#fff; color:#1f6d69;">
-            <h2 style="font-size: 15px; margin-top:7px; font-weight:bolder;">{{ $bookings->meetingRoom->name}} | {{ $bookings->meetingRoom->room_number }} | {{ $bookings->time}} </h2>
-        </div>
-    </div>
-    <div class="form-section">
-        <div class="register-card">
-            <div class="register-title">Registration</div>
-            <div class="register-subtext">Please fill this registration form to register for the meeting</div>
-
-            @if(session('success'))
-                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                <script>
-                    Swal.fire({
-                        icon: 'success',
-                        title: '{{ session('success') }}',
-                        showConfirmButton: false,
-                        timer: 3000
-                    });
-                </script>
-            @endif
-
-            <form class="register-form" action="{{ route('register.attendees.store') }}" method="POST" id="registerForm">
-                @csrf
-                <input type="hidden" name="booking_id" value="{{ $bookings->id }}">
-
-                <input type="text" class="register-input" name="name" placeholder="Full Name" required>
-
-                <select class="register-input" name="gender" required>
-                    <option value="" disabled selected>Select Gender</option>
-                    <option value="Male" @if(old('gender') == 'Male') selected @endif>Male</option>
-                    <option value="Female" @if(old('gender') == 'Female') selected @endif>Female</option>
-                </select>
-
-                <input type="email" class="register-input" name="email" placeholder="Email" required>
-
-                <input type="text" class="register-input" name="department" placeholder="Department/ Company" required>
-
-                <input type="tel" class="register-input" name="phone" placeholder="Phone Number" required>
-
-                <button type="submit" class="register-btn">Register</button>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-    function applyMaximizeState() {
-        const mainContent = document.getElementById('mainContent');
-        const navbar = document.querySelector('nav.navbar');
-        const btn = document.getElementById('maximizeBtn');
-        const isMaximized = localStorage.getItem('isMaximized') === 'true';
-
-        if (isMaximized) {
-            mainContent.classList.add('maximized');
-            if (navbar) {
-                navbar.style.display = 'none';
-            }
-            btn.textContent = '❐'; // Restore icon
-        } else {
-            mainContent.classList.remove('maximized');
-            if (navbar) {
-                navbar.style.display = '';
-            }
-            btn.textContent = '⬜'; // Maximize icon
-        }
-    }
-
-    document.getElementById('maximizeBtn').addEventListener('click', function() {
-        const mainContent = document.getElementById('mainContent');
-        const navbar = document.querySelector('nav.navbar');
-        const btn = this;
-
-        if (!mainContent.classList.contains('maximized')) {
-            mainContent.classList.add('maximized');
-            if (navbar) {
-                navbar.style.display = 'none';
-            }
-            btn.textContent = '❐'; // Restore icon
-            localStorage.setItem('isMaximized', 'true');
-        } else {
-            mainContent.classList.remove('maximized');
-            if (navbar) {
-                navbar.style.display = '';
-            }
-            btn.textContent = '⬜'; // Maximize icon
-            localStorage.setItem('isMaximized', 'false');
-        }
-    });
-
-    // Apply maximize state on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        applyMaximizeState();
-    });
-</script>
-@endsection --}}
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -343,6 +37,7 @@
         position: fixed;
         top: 20px;
         right: 20px;
+        left: 20px;
         z-index: 1000;
         display: flex;
         gap: 8px;
@@ -363,8 +58,9 @@
       }
 
       .nav-link:hover {
-        background: rgba(66, 204, 197, 0.1);
+        background: rgb(20, 81, 78);
         transform: translateY(-1px);
+        color: #fff;
       }
 
       .registration-container {
@@ -424,8 +120,7 @@
 
       .event-title {
         font-size: 2.2rem;
-        font-weight: 800;
-        margin-bottom: 5.3rem;
+        font-weight: 600;
         letter-spacing: -0.025em;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
@@ -446,8 +141,8 @@
       .event-image {
         border-radius: 12px;
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        width: 250px;
-        height: 300px;
+        width: 350px;
+        height: 350px;
         margin-bottom: 70px;
       }
 
@@ -516,6 +211,7 @@
         color: rgb(71, 85, 105);
         font-size: 1rem;
         font-weight: 500;
+        margin-top: -20px;
       }
 
       .form-card {
@@ -1060,12 +756,6 @@
           font-size: 0.9rem;
           border-radius: 10px;
         }
-
-        .success-message {
-          padding: 0.8rem;
-          font-size: 0.8rem;
-          border-radius: 10px;
-        }
       }
 
       /* Extra Small Mobile (max-width: 319px) */
@@ -1117,21 +807,132 @@
           font-size: 0.85rem;
         }
       }
+
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: auto;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(5px);
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s ease;
+      }
+
+      .modal-content {
+        background: #fff;
+        border-radius: 16px;
+        padding: 36px 32px 28px 32px;
+        box-shadow: 0 8px 32px rgba(66,204,197,0.18), 0 2px 8px rgba(0,0,0,0.08);
+        max-width: 350px;
+        width: 100%;
+        position: relative;
+        text-align: center;
+        animation: slideDown 0.4s ease forwards;
+        border: 1.5px solid #e0f7f5;
+      }
+
+      .modal-content h2 {
+        color: #42CCC5;
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 18px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .modal-content label {
+        display: block;
+        color: #333;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        text-align: left;
+      }
+
+      .modal-content .form-group {
+        margin-bottom: 18px;
+        text-align: left;
+      }
+
+      .modal-content input[type="text"] {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid #42CCC5;
+        border-radius: 8px;
+        font-size: 1rem;
+        margin-bottom: 6px;
+        background: #f9fefe;
+        transition: border-color 0.2s;
+      }
+
+      .modal-content input[type="text"]:focus {
+        border-color: #14b8a6;
+        outline: none;
+        background: #fff;
+      }
+
+      .modal-content .btn-success {
+        width: 100%;
+        background: linear-gradient(90deg, #42CCC5 0%, #14b8a6 100%);
+        color: #fff;
+        padding: 12px 0;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.08rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 10px;
+      }
+
+      .modal-content .btn-success:hover {
+        background: #36b3ad;
+      }
+
+      .modal .close {
+        color: #888;
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 28px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+
+      .modal .close:hover,
+      .modal .close:focus {
+        color: #42CCC5;
+        text-decoration: none;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
     </style>
   </head>
   <body>
     <nav class="navigation">
-      <a href="{{ route('register.attendees.index') }}" class="nav-link">← Home</a>
-      {{-- <a href="/login.html" class="nav-link">Login</a> --}}
+      <a href="{{ route('register.index') }}" class="nav-link">← Home</a>
     </nav>
 
     <div class="registration-container">
       <!-- Event Details Section -->
       <div class="event-section">
         <div class="event-content">
-          <h1 class="event-title">{{ $bookings->requester }}</h1>
-          {{-- <p class="event-subtitle">Innovation Meets Opportunity</p> --}}
-
           <div class="event-image-container">
             @if($bookings->flyer_path)
                 <img src="{{ asset($bookings->flyer_path) }}" alt="Event logo" class="event-image" loading="lazy">
@@ -1140,6 +941,7 @@
             @endif
           </div>
 
+          <h1 class="event-title">{{ $bookings->requester }}</h1>
           <div class="event-details">
             <div class="detail-item">
               <svg class="detail-icon" fill="currentColor" viewBox="0 0 24 24">
@@ -1179,6 +981,9 @@
           <div class="form-header">
             <h2 class="form-title">Registration Form</h2>
             <p class="form-subtitle">Join us for an unforgettable experience</p>
+            <p style="color:#2dd4bf; margin-top: -10px;">___________________________________________</p>
+            <button style="margin-top: 20px;" type="button" id="openVerifyModal" class="nav-link">Click here if already registered to Verify</button>
+            <p style="margin-top: 30px;">OR</p>
           </div>
 
           @if(session('success'))
@@ -1207,6 +1012,7 @@
                     required
                     placeholder="Enter full name"
                     class="form-input"
+                    style="text-transform: uppercase;"
                   />
                 </div>
               </div>
@@ -1226,7 +1032,7 @@
                 <div class="form-group">
                   <label for="phone" class="form-label">Phone Number *</label>
                   <input
-                    type="tel"
+                    type="number"
                     name="phone"
                     required
                     placeholder="0244444444"
@@ -1235,7 +1041,7 @@
                 </div>
                 <div class="form-group">
                   <label for="gender" class="form-label">Gender *</label>
-                  <select  name="gender" class="form-input" required>
+                  <select  name="gender" class="form-input" required style="text-transform: uppercase;">
                     <option value="" disabled selected>Select gender</option>
                     <option value="Male" @if(old('gender') == 'Male') selected @endif>Male</option>
                     <option value="Female" @if(old('gender') == 'Female') selected @endif>Female</option>
@@ -1253,6 +1059,7 @@
                   required
                   placeholder="Enter company, organization or department"
                   class="form-input"
+                  style="text-transform: uppercase;"
                 />
               </div>
 
@@ -1264,12 +1071,79 @@
         </div>
       </div>
     </div>
+  <!-- Verification Modal -->
+  <div id="verifyModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Verify Attendance</h2>
+      <form id="verifyForm" method="POST" action="{{ route('register.attendees.verify') }}">
+        @csrf
+        <div class="form-group">
+          <label for="verify_code">Meeting Code:</label>
+          <input type="text" name="code" id="verify_code" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-success" style="margin-top: 18px; width: 100%;">Verify</button>
+      </form>
+    </div>
+  </div>
   </body>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    document.getElementById('registerForm').addEventListener('submit', function() {
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
       const now = new Date();
       const isoString = now.toISOString();
       document.getElementById('registration_time').value = isoString;
+
+      // Show loading popup
+      Swal.fire({
+        title: 'Registering...',
+        text: 'Please wait while we process your registration and send the confirmation email.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
     });
   </script>
+  <script>
+    document.getElementById('verifyForm').addEventListener('submit', function(e) {
+      Swal.fire({
+        title: 'Verifying...',
+        text: 'Please wait while we verify your code.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+    });
+
+    document.getElementById('openVerifyModal').onclick = function () {
+      const modal = document.getElementById('verifyModal');
+      modal.style.display = 'flex';
+    };
+    document.querySelector('#verifyModal .close').onclick = function() {
+        document.getElementById('verifyModal').style.display = 'none';
+    };
+  </script>
+  @if(session('success'))
+  <script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Verified!',
+        text: '{{ session('success') }}',
+        confirmButtonColor: '#42CCC5'
+    });
+  </script>
+  @endif
+
+  @if(session('error'))
+  <script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: '{{ session('error') }}',
+        confirmButtonColor: '#42CCC5'
+    });
+  </script>
+  @endif
 </html>

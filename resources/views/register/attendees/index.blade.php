@@ -27,7 +27,7 @@
             </form>
         </div>
 
-        <div class="table-wrapper">
+        <div class="table-responsive"><div class="table-wrapper" style="overflow-x:auto;">
             <table class="fl-table">
                 <thead>
                     <tr>
@@ -79,15 +79,18 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
+        </div></div>
     </div>
 </div>
 
 <style>
     @media (max-width: 768px) {
-        .table-wrapper {
-            max-height: none;
-            overflow: visible;
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .table-responsive table {
+            min-width: 600px;
         }
         .fl-table {
             font-size: 12px;
@@ -304,3 +307,21 @@
 </style>
 
 @include('register.layouts.footer')
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('form').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Please wait while we process your request.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        });
+    });
+});
+</script>

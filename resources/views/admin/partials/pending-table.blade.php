@@ -1,7 +1,7 @@
 @if ($pendingBookings->isEmpty())
     <p style="color: red;">No requests available yet.</p>
 @else
-    <div class="table-wrapper">
+    <div class="table-responsive"><div class="table-wrapper" style="overflow-x:auto;">
         <table class="fl-table">
             <thead>
                 <tr>
@@ -45,5 +45,17 @@
                 @endforeach
             </tbody>
         </table>
-    </div>
+    </div></div>
 @endif
+
+<style>
+    @media (max-width: 768px) {
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .table-responsive table {
+            min-width: 600px;
+        }
+    }
+</style>

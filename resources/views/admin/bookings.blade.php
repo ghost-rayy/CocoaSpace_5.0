@@ -6,9 +6,9 @@
 @section('content')
     <div class="container">
         <h1 style="font-weight:bolder; text-transform:uppercase; text-align:center;">Manage Bookings</h1>
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 0px;">
-            <form action="{{ route('admin.bookings') }}" method="GET" style="display: flex; gap: 10px;">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or e-ticket" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 5px;">
+        <div style="width: 100%; display: flex; justify-content: flex-end; margin-bottom: 0;">
+            <form action="{{ route('admin.bookings') }}" method="GET" class="search-bar-responsive" style="display: flex; gap: 10px; width: 100%; max-width: 500px;">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or e-ticket" style="flex:1; padding: 8px 12px; border: 1px solid #ccc; border-radius: 5px; min-width:0;">
                 <button type="submit"
                         style="padding: 8px 15px; background-color: #42CCC5; border: none; color: white; border-radius: 5px;">
                     🔍 Search
@@ -31,8 +31,8 @@
         </script>
         @endif
 
-    <div class="table-wrapper" style="overflow-x:auto;">
-        <table class="fl-table" style="min-width: 1000px;">
+    <div class="table-responsive"><div class="table-wrapper" style="overflow-x:auto;">
+        <table class="fl-table">
             <thead>
                 <tr>
                     <th>Requester / Title</th>
@@ -67,17 +67,16 @@
                         <td>
                             <form action="{{ route('admin.bookings.updateStatus', $booking->id) }}" method="POST">
                                 @csrf
-                                <select name="status" class="form-select" onchange="this.form.submit()" style="background-color: #0ad2ed; color: white; border:none; padding:4px; cursor:hand;">
-                                    <option value="Pending" {{ $booking->status == 'Pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="Approved" {{ $booking->status == 'Approved' ? 'selected' : '' }}>Approve</option>
-                                    <option value="Declined" {{ $booking->status == 'Declined' ? 'selected' : '' }}>Decline</option>
+                                <select name="status" class="form-select" onchange="this.form.submit()" style="background-color: none; color: rgb(0, 0, 0); border:none; cursor:hand; font-size:15px; width:100%;">
+                                    <option style="font-size:10px;" value="Pending" {{ $booking->status == 'Pending' ? 'selected' : '' }}>Pending</option>
+                                    <option style="font-size:10px;" value="Approved" {{ $booking->status == 'Approved' ? 'selected' : '' }}>Approve</option>
+                                    <option style="font-size:10px;" value="Declined" {{ $booking->status == 'Declined' ? 'selected' : '' }}>Decline</option>
                                 </select>
                             </form>
                         </td>
                         <td>
                             @if($booking->e_ticket)
                                 <span id="ticket-{{ $booking->id }}" style="color: green; font-weight: bold;">{{ $booking->e_ticket }}</span>
-                                <button onclick="copyToClipboard({{ $booking->id }})" class="btn btn-sm btn-outline-secondary">Copy</button>
                             @else
                                 N/A
                             @endif
@@ -111,8 +110,7 @@
 
             </tbody>
         </table>
-    </div>
-    </div>
+    </div></div>
 @endsection
 <script>
 
@@ -125,8 +123,7 @@
 </script>
     <style>
         .table-wrapper {
-            max-height: 82%;
-            overflow-y: auto;
+            max-height: auto;
             overflow-x: hidden;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -145,14 +142,14 @@
             background-color: #42CCC5;
             color: white;
             font-weight: bold;
-            text-align: center;
-            padding: 19px;
+            text-align: left;
+            padding: 10px;
             z-index: 2;
         }
 
         .fl-table th, .fl-table td {
             padding: 10px;
-            text-align: center;
+            text-align: left;
             border-bottom: 1px solid #0ad2ed;
             font-size: 14px;
             text-transform: uppercase;
@@ -166,11 +163,38 @@
             background-color: #e0f0ff;
         }
 
-        /* Optional: Improve responsiveness */
+        .table-responsive {
+            width: 100%;
+        }
+        .table-responsive table {
+            width: 100%;
+        }
+
         @media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto;
+            }
+            .table-responsive table {
+                min-width: 600px;
+            }
             .fl-table th, .fl-table td {
                 font-size: 12px;
                 padding: 8px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .search-bar-responsive {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                width: 100% !important;
+            }
+            .search-bar-responsive input[type="text"] {
+                width: 100% !important;
+                margin-bottom: 8px !important;
+            }
+            .search-bar-responsive button[type="submit"] {
+                width: 100% !important;
             }
         }
     </style>

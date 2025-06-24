@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('room_number')->unique();
             $table->string('floor');
-            $table->string('capacity');
+            $table->integer('capacity');
             $table->timestamps();
         });
     }

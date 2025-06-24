@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+        @extends('layouts.user-sidebar')
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -16,23 +18,8 @@
             padding: 0;
         }
 
-        .form-container {
-            width: 10%;
-            margin-top: 20px;
-            /* margin-left: 70px; */
-            padding: 40px;
-            border-radius: 20px;
-            /* background: #a0d8db; */
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-            backdrop-filter: blur(6px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            color: #000;
-            width: 1600px;
-        }
-
         h2 {
             text-align: left;
-            /* margin-bottom: 10px; */
             color: #000;
             font-weight: bolder;
             text-transform: none;
@@ -44,7 +31,7 @@
 
         .table-wrapper {
             width: 95%;
-            max-height: 550px;
+            max-height: 540px;
             overflow: auto;
             border-radius: 20px;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
@@ -178,26 +165,34 @@
                 max-height: 300px;
             }
         }
+
+        @media (max-width: 768px) {
+            .table-responsive {
+                width: 100%;
+                overflow-x: auto;
+            }
+            .table-responsive table {
+                min-width: 600px;
+            }
+        }
     </style>
 </head>
 <body>
-    @include('layouts.user-sidebar')
 
-    <div class="content">
-            {{-- <div class="form-container"> --}}
-            <div class="header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; margin-right: 150px;">
-                <h2 style="font-size: 30px; font-weight:bolder;">My Bookings</h2>
-                <div class="header-controls" style="display: flex; gap: 10px; align-items: center;">
-                    <a href="{{ route('booking.create') }}" class="btn-book-room" style="background-color: #00bcd4; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-weight: 600; transition: background-color 0.3s ease;">Book a Room</a>
-                    {{-- <input type="text" id="searchInput" placeholder="Search bookings..." onkeyup="filterTable()" style="padding: 8px 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 14px; width: 200px;"> --}}
-                </div>
+    @section('content')
+        <div class="header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; margin-right: 150px;">
+            <h2 style="font-size: 30px; font-weight:bolder;">My Bookings</h2>
+            <div class="header-controls" style="display: flex; gap: 10px; align-items: center;">
+                <a href="{{ route('booking.create') }}" class="btn-book-room" style="background-color: #00bcd4; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-weight: 600; transition: background-color 0.3s ease;">Book a Room</a>
             </div>
+        </div>
 
+        <div class="table-responsive">
             <div class="table-wrapper">
                 <table id="bookingsTable">
                     <thead>
                         <tr>
-                            <th>Room Details</th>
+                            <th>Room Name</th>
                             <th>Floor</th>
                             <th>Room Number</th>
                             <th>Date</th>
@@ -243,34 +238,23 @@
                     </tbody>
                 </table>
             </div>
-
-            {{-- <div id="user-bookings-table">
-                @include('user.partials.bookings-table', ['bookings' => $bookings])
-            </div> --}}
-        {{-- </div> --}}
-    </div>
-
-    <script>
-        function cancelBooking(id) {
-            // Implement cancel booking logic here
-            alert('Cancel booking with ID: ' + id);
-        }
-
-        function rebookBooking(id) {
-            // Implement rebook booking logic here
-            alert('Rebook booking with ID: ' + id);
-        }
-    </script>
+        </div>
+@endsection
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('form').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Please wait while we process your request.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        });
+    });
+});
+</script>
 </body>
 </html>
-
-<script>
-    setInterval(function () {
-        fetch("{{ route('user.refreshBookings') }}")
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById("user-bookings-table").innerHTML = html;
-            })
-            .catch(error => console.error("Error refreshing bookings:", error));
-    }, 5000);
-</script>

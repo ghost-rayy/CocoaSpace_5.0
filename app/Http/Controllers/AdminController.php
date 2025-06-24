@@ -27,10 +27,12 @@ class AdminController extends Controller
         $totalUsers = User::where('is_admin', false)->count(); // exclude admins
         $totalBookings = Booking::count();
 
-        $availableRooms = MeetingRoom::count() - Booking::where('status', 'Approved')->count();
-        $bookedRooms = Booking::where('status', 'Approved')->count();
+        $rooms = MeetingRoom::with(['bookings' => function($query) {
+            $query->where('status', 'Approved');
+        }])->get();
 
-        $rooms = MeetingRoom::all();
+        $bookedRooms = $rooms->count();
+        $availableRooms = MeetingRoom::count() - $bookedRooms;
 
         // Prepare booking data based on period
         $labels = [];
@@ -124,47 +126,48 @@ class AdminController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'staff_id' => 'required|string|unique:users,staff_id',
             'department' => 'required|string|max:255',
             'office_number' => 'required|string|max:50',
             'password' => 'required|string|min:6|confirmed',
+            'role' => 'required|in:admin,staff',
         ]);
 
-        User::create([
+        $user = new \App\Models\User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->staff_id = $request->staff_id;
+        $user->department = $request->department;
+        $user->office_number = $request->office_number;
+        $user->role = $request->role; // Default to staff if not set
+        $user->password = bcrypt($request->password);
+        $user->save();
+
+        return redirect()->route('admin.dashboard')->with('success', 'User added successfully!');
+    }
+
+    public function edit(User $user)
+    {
+        return view('admin.user-edit', compact('user'));
+    }
+
+    public function update(Request $request)
+    {
+        $user = User::findOrFail($request->user_id);
+        
+        $user->update([
+            'role' => $request->role,
             'name' => $request->name,
             'email' => $request->email,
             'staff_id' => $request->staff_id,
             'department' => $request->department,
             'office_number' => $request->office_number,
-            'password' => Hash::make($request->password),
-            'is_admin' => false,
-            'role' => 'user',
         ]);
 
-        return redirect()->route('admin.dashboard')->with('success', 'User added successfully!');
-    }
-
-        public function edit(User $user)
-    {
-        return view('admin.user-edit', compact('user'));
-    }
-
-    public function update(Request $request, User $user)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'staff_id' => 'required|string|unique:users,staff_id,' . $user->id,
-            'department' => 'required|string|max:255',
-            'office_number' => 'required|string|max:255',
-        ]);
-
-        $user->update($request->all());
-
-        return redirect()->route('admin.dashboard')->with('success', 'User updated successfully.');
+        return redirect()->back()->with('success', 'User updated successfully');
     }
 
     public function updateStatus(Request $request, $id)
@@ -225,7 +228,9 @@ class AdminController extends Controller
 
     public function index()
     {
-        $rooms = MeetingRoom::all();
+        // $rooms = MeetingRoom::all();
+
+        $rooms = MeetingRoom::with('bookings')->get();
         return view('admin.meeting_rooms', compact('rooms'));
     }
 

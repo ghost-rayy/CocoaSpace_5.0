@@ -26,6 +26,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            
             'meeting_room_id' => 'required|exists:meeting_rooms,id',
             'requester' => 'required|string',
             'date' => 'required|date',

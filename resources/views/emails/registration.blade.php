@@ -5,9 +5,15 @@
 </head>
 <body>
     <h1>Registration Successful</h1>
-    <h2>Hello, {{ $name }}!</h2>
-    <p>Thank you for registering for the meeting. Your registration has been successfully received.</p>
-    <p>We look forward to your participation.</p>
+    <p>Hello {{ $name }},</p>
+    <p>Your registration was successful!</p>
+
+    @if(!empty($meeting_code))
+        <p><strong>Your Meeting Code:</strong></p>
+        <h2 style="color:#42CCC5;">{{ $meeting_code }}</h2>
+        <p>Please keep this code safe. You will need it to verify your attendance at the meeting.</p>
+    @endif
+
     <br>
     <p>Best regards,<br>CocoaSpace Team</p>
 </body>

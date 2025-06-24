@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('gender', ['Male', 'Female', 'Other']);
             $table->string('email');
             $table->string('department');
-            $table->string('phone');
+            $table->integer('phone');
             $table->timestamps();
 
             $table->foreign('booking_id')->references('id')->on('bookings')->onDelete('cascade');

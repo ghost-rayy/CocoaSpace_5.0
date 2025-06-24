@@ -10,15 +10,17 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 
-class RegistrationConfirmation extends Mailable
+class RegistrationConfirmation extends Mailable implements ShouldQueue
 {
      use Queueable, SerializesModels;
 
     public $name;
+    public $meeting_code;
 
-    public function __construct($name)
+    public function __construct($name, $meeting_code)
     {
         $this->name = $name;
+        $this->meeting_code = $meeting_code;
     }
 
     public function build()

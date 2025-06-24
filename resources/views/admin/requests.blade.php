@@ -10,8 +10,7 @@
         @endif
 
             <h1>Pending Requests</h1>
-
-
+            
             {{-- <div class="table-wrapper">
                 <table class="fl-table">
                     <thead>
@@ -65,16 +64,6 @@
         @endif
     </div>
 @endsection
-<script>
-    setInterval(function () {
-        fetch("{{ route('admin.refreshPendingTable') }}")
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById("pending-bookings-table").innerHTML = html;
-            })
-            .catch(err => console.error("Auto-refresh failed:", err));
-    }, 5000);
-</script>
 
 <style>
 
@@ -93,7 +82,7 @@ p{
 }
 
  .table-wrapper {
-        max-height: 700px;
+        max-height: auto;
         overflow-y: auto;
         overflow-x: hidden;
         border: 1px solid #ddd;

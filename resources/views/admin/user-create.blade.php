@@ -88,4 +88,23 @@
         <button type="submit" class="btn btn-primary">Add User</button>
     </form>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var userForm = document.querySelector('form[action="{{ route('admin.users-store') }}"]');
+    if (userForm) {
+        userForm.addEventListener('submit', function(e) {
+            Swal.fire({
+                title: 'Adding user...',
+                text: 'Please wait while we add the user.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        });
+    }
+});
+</script>
 @endsection

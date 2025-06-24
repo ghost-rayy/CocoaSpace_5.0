@@ -4,7 +4,7 @@
         .navbar {
             background-color: #42CCC5;
             padding: 10px 20px;
-            /* margin-top: -35px; */
+            margin-top: -35px;
         }
         .navbar-brand {
             font-weight: bold;

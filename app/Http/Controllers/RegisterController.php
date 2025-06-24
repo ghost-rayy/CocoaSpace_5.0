@@ -10,7 +10,7 @@ use App\Mail\AttendeeRegistered;
 use Illuminate\Support\Facades\Mail;
 use App\Services\AfricasTalkingService;
 use App\Mail\RegistrationConfirmation;
-
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -35,10 +35,6 @@ class RegisterController extends Controller
         return view('register.attendees.register', compact('bookings'), ['id' => $id]);
     }
 
-    public function __construct(AfricasTalkingService $smsService)
-    {
-        $this->smsService = $smsService;
-    }
 
     public function store(Request $request)
     {
@@ -58,14 +54,25 @@ class RegisterController extends Controller
             'email' => $validated['email'],
             'department' => $validated['department'],
             'phone' => $validated['phone'],
+            // 'meeting_code' => strtoupper(Str::random(6)),
+            'status' => 'present',
         ]);
 
         if (!$attendee) {
             return back()->with('error', 'Failed to register attendee.');
         }
 
-        Mail::to($validated['email'])->send(new RegistrationConfirmation($validated['name']));
+        // Mail::to($attendee->email)->send(new RegistrationConfirmation($attendee->name, null));
         // Mail::to($validated['email'])->queue(new RegistrationConfirmation($validated['name']));
+
+        try {
+            Mail::to($attendee->email)->send(new RegistrationConfirmation($attendee->name, null));
+        } catch (\Exception $e) {
+            \Log::error('Failed to queue registration confirmation email: ' . $e->getMessage());
+            return back()->with('error', 'Failed to queue email: ' . $e->getMessage());
+        }
+
+        $bookings = Booking::with('meetingRoom')->get();
 
         return redirect()->route('register.attendees.register', $validated['booking_id'])->with('success', 'Attendee registered successfully!');
     }

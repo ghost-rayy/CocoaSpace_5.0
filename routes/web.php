@@ -39,7 +39,7 @@ Route::get('/admin/dashboard', [AdminController::class, 'adash'])->middleware('a
 Route::get('/admin/users/create', [AdminController::class, 'create'])->name('admin.users-create');
 Route::post('/admin/users', [AdminController::class, 'store'])->name('admin.users-store');
 Route::get('/admin/users/{user}/edit', [AdminController::class, 'edit'])->name('admin.users-edit');
-Route::put('/admin/users/{user}', [AdminController::class, 'update'])->name('admin.users-update');
+Route::put('/admin/users/update', [AdminController::class, 'update'])->name('admin.users-update');
 Route::delete('/admin/users/{user}', [AdminController::class, 'destroy'])->name('admin.users-destroy');
 Route::get('/admin/bookings', [AdminController::class, 'bookings'])->name('admin.bookings');
 Route::post('/admin/bookings/{id}/approve', [AdminController::class, 'approve'])->name('bookings.approve');
@@ -63,6 +63,7 @@ Route::get('/attendees', [MeetingAttendeeController::class, 'indexReg'])->name('
 Route::get('/attendees/register/{id}', [MeetingAttendeeController::class, 'showRegistrationForm'])->name('admin.attendees.register');
 Route::post('/attendees/store', [MeetingAttendeeController::class, 'store'])->name('admin.attendees.store');
 Route::get('/admin/attendees/view/{id}', [MeetingAttendeeController::class, 'viewAttendees'])->name('admin.attendees.view');
+Route::post('/register/attendees/verify', [MeetingAttendeeController::class, 'verify'])->name('register.attendees.verify');
 
 
 Route::middleware(['auth', 'role:register'])->group(function () {

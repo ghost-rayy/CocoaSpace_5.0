@@ -1,109 +1,3 @@
-{{-- @extends('layouts.app')
-
-<style>
-.login {
-    background-color:none;
-    border-radius: 12px;
-    padding: 20px;
-    margin-right: 240px;
-    margin-left:1200px;
-    margin-top: 260px;
-    width: 1000px;
-}
-
-.yes {
-    margin-right: 100%;
-    padding-right: 50px;
-}
-
-.card-body {
-    background-color:none;
-    text-align: left;
-}
-
-.form-controls {
-    border-radius: 20px;
-    padding: 12px;
-    font-size: 16px;
-    border: 2px solid rgba(128, 128, 128, 0.1);
-    width: 470px;
-    background-color: rgba(255, 255, 255, 0.8);
-    outline: none;
-    transition: border 0.3s ease-in-out;
-    margin-left:0px;
-}
-
-.form-controls:focus {
-    border: 2px solid #42CCC5(245, 150, 7, 8);
-    background-color: rgb(255, 255, 255);
-}
-
-
-.button {
-    background-color: #42CCC5;
-    border: none;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 8px;
-    width:470px;
-    margin-right: 50px;
-    margin-left:-330;
-    border-radius: 20px;
-    color: white;
-    font-weight: bold;
-}
-
-.button:hover {
-    background-color: #174c66;
-    color: #ffffff;
-    border: 2px solid rgba(171, 176, 182, 0.9);
-}
-
-</style>
-
-@section('content')
-<div class="login">
-
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
-
-        <div class="row mb-3">`
-            <div class="col-md-6">
-                <input id="email" type="email" class="form-controls @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" placeholder="Email" required autocomplete="email" autofocus>
-
-                @error('email')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                @enderror
-            </div>
-        </div><br>
-
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <input id="password" type="password" class="form-controls @error('password') is-invalid @enderror" name="password" placeholder="Password" required autocomplete="current-password">
-
-                @error('password')
-                    <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                @enderror
-            </div>
-        </div><br><br><br>
-
-        <div class="row mb-0">
-            <div class="col-md-8 offset-md-4">
-                <button type="submit" class="button">
-                    {{ __('Sign In') }}
-                </button>
-            </div>
-        </div>
-    </form>
-
-@endsection
- --}}
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -157,6 +51,19 @@
             </form>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      document.querySelector('form[action="{{ route('login') }}"]').addEventListener('submit', function(e) {
+        Swal.fire({
+          title: 'Signing in...',
+          text: 'Please wait while we log you in. Designed by Raymond Appiasi & Written-Right Ohene Kwame',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+      });
+    </script>
 </body>
 </html>
 
@@ -329,7 +236,7 @@ body {
         opacity: 0.9;
   }
   .input-box, .input-submit {
-    width: 70%;
+    width: 100%;
 }
 }
 @media (max-width: 1100px) {
@@ -367,18 +274,18 @@ body {
 
 
 @media (max-width: 999px) {
-  /* .coco-image {
+  .coco-image {
     display: none;
   }
 
   .login-box {
     width: 100%; /* optional: make login box full width 
      margin: auto; 
-  } */
+  } 
 
    .main {
     width: 72%;
-    /* margin: 0 auto;  */
+    margin: 0 auto; 
   }
 
   .coco-image {

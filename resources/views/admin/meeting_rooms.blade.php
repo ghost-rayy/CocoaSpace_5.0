@@ -5,7 +5,7 @@
 @section('content')
 <div class="container">
     <h1>Meeting Rooms</h1>
-    <!-- Button to open the modal -->
+
     <button id="openModalBtn" class="btn btn-success" style="padding: 8px 15px; background-color: #42CCC5; border: none; color: white; border-radius: 5px; cursor: hand;">Add Meeting Room</button>
 
     @if(session('success'))
@@ -22,9 +22,8 @@
         </script>
     @endif
 
-    <br><br>
     <div class="table-wrapper">
-        <table class="fl-table">
+        <div class="table-responsive"><table class="fl-table">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -36,7 +35,7 @@
             </thead>
             <tbody>
                 @foreach ($rooms as $room)
-                <tr>
+                <tr class="room-row" style="cursor:pointer;" data-room-id="{{ $room->id }}">
                     <td>{{ $room->name }}</td>
                     <td>{{ $room->room_number }}</td>
                     <td>{{ $room->floor }}</td>
@@ -50,9 +49,26 @@
                         </form>
                     </td>
                 </tr>
+                <tr class="booking-details" id="details-{{ $room->id }}" style="display:none; background:#f9f9f9;">
+                    <td colspan="5">
+                        @if($room->bookings->count())
+                            <ul style="margin:0; padding-left:20px;">
+                                @foreach($room->bookings as $booking)
+                                    <li>
+                                        <strong>Date:</strong> {{ $booking->date }} |
+                                        <strong>Time:</strong> {{ $booking->time }} |
+                                        <strong>Requester/Title:</strong> {{ $booking->requester }}
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <em>No bookings for this room.</em>
+                        @endif
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
-        </table>
+        </table></div>
     </div>
 </div>
 
@@ -66,15 +82,22 @@
             @csrf
             <div class="mb-3">
                 <label class="form-label">Room Name</label>
-                <input type="text" name="name" class="form-control" required>
+                <input type="text" name="name" class="form-control" style="text-transform: uppercase;" required>
             </div>
             <div class="mb-3">
                 <label class="form-label">Room Number</label>
-                <input type="text" name="room_number" class="form-control" required>
+                <input type="number" name="room_number" class="form-control" required>
             </div>
             <div class="mb-3">
                 <label class="form-label">Floor</label>
-                <input type="text" name="floor" class="form-control" required>
+                <select name="floor" class="form-control" required>
+                    <option value="Ground Floor">Ground Floor</option>
+                    @for ($i = 1; $i <= 100; $i++)
+                        <option value="{{ $i }}{{ $i == 1 ? 'st' : ($i == 2 ? 'nd' : ($i == 3 ? 'rd' : 'th')) }} Floor">
+                            {{ $i }}{{ $i == 1 ? 'st' : ($i == 2 ? 'nd' : ($i == 3 ? 'rd' : 'th')) }} Floor
+                        </option>
+                    @endfor
+                </select>
             </div>
             <div class="mb-3">
                 <label class="form-label">Capacity</label>
@@ -97,15 +120,15 @@
             @method('PUT')
             <div class="mb-3">
                 <label for="editName" class="form-label">Room Name</label>
-                <input type="text" id="editName" name="name" class="form-control" required>
+                <input type="text" id="editName" name="name" class="form-control" style="text-transform: uppercase;" required>
             </div>
             <div class="mb-3">
                 <label for="editRoomNumber" class="form-label">Room Number</label>
-                <input type="text" id="editRoomNumber" name="room_number" class="form-control" required>
+                <input type="number" id="editRoomNumber" name="room_number" class="form-control" required>
             </div>
             <div class="mb-3">
                 <label for="editFloor" class="form-label">Floor</label>
-                <input type="text" id="editFloor" name="floor" class="form-control" required>
+                <input type="text" id="editFloor" name="floor" class="form-control" style="text-transform: uppercase;" required>
             </div>
             <div class="mb-3">
                 <label for="editCapacity" class="form-label">Capacity</label>
@@ -153,6 +176,20 @@
             }
         }
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.room-row').forEach(function(row) {
+            row.addEventListener('click', function() {
+                var roomId = this.getAttribute('data-room-id');
+                var detailsRow = document.getElementById('details-' + roomId);
+                if (detailsRow.style.display === 'none' || detailsRow.style.display === '') {
+                    detailsRow.style.display = 'table-row';
+                } else {
+                    detailsRow.style.display = 'none';
+                }
+            });
+        });
+    });
 </script>
 @endsection
 
@@ -188,16 +225,17 @@
         background-color: #42CCC5;
         color: white;
         font-weight: bold;
-        text-align: center;
+        text-align: left;
         padding: 12px;
         z-index: 2;
     }
 
     .fl-table th, .fl-table td {
         padding: 10px;
-        text-align: center;
+        text-align: left;
         border-bottom: 1px solid #ddd;
         font-size: 14px;
+        text-transform: uppercase;
     }
 
     .fl-table tbody tr:nth-child(even) {
@@ -236,7 +274,7 @@
         padding: 30px 40px;
         border-radius: 12px;
         width: 400px;
-        max-width: 90%;
+        max-width: 30%;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         animation: slideDown 0.4s ease forwards;
@@ -322,6 +360,33 @@
 
     .modal-content button[type="submit"]:hover {
         background-color: #36b3ad;
+    }
+
+    @media (max-width: 768px) {
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .table-responsive table {
+            min-width: 600px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .modal-content {
+            width: 90% !important;
+            max-width: 99% !important;
+            padding: 8px 7px !important;
+        }
+    }
+
+    .booking-details td {
+        padding: 15px;
+        background: #f9f9f9;
+        border-top: 1px solid #ddd;
+    }
+    .room-row:hover {
+        background: #e0f7fa;
     }
 </style>
 
