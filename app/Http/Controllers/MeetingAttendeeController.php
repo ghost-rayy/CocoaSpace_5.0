@@ -10,20 +10,23 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\RegistrationConfirmation;
 use App\Mail\AttendeeRegistered;
 use Illuminate\Support\Str;
+use App\Models\MeetingAttendee as Attendee;
+use Illuminate\Support\Facades\Validator;
 
 class MeetingAttendeeController extends Controller
 {
-    public function indexReg( Request $request)
+    public function indexReg(Request $request)
     {
         $search = $request->input('search');
 
-        $bookings = Booking::where('status', 'Approved')->with('meetingRoom')
-        ->when($search, function ($query, $search) {
-            return $query->where('e_ticket', 'like', "%{$search}%")
-                        ->orWhere('requester', 'like', "%{$search}%");
-        })
-        ->orderBy('created_at', 'desc')
-        ->get();
+        $bookings = Booking::whereIn('status', ['Approved', 'Not Started', 'Started'])
+            ->with('meetingRoom')
+            ->when($search, function ($query, $search) {
+                return $query->where('e_ticket', 'like', "%{$search}%")
+                            ->orWhere('requester', 'like', "%{$search}%");
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
         return view('admin.attendee.index', compact('bookings'));
     }
 
@@ -111,6 +114,93 @@ class MeetingAttendeeController extends Controller
             return back()->with('success', 'Verification successful! You are marked as present.');
         } else {
             return back()->with('error', 'Invalid code or email.');
+        }
+    }
+
+    public function showImportForm()
+    {
+        $bookings = Booking::with('meetingRoom')
+            ->whereIn('status', ['Approved', 'Not Started', 'Started'])
+            ->get();
+        return view('admin.attendee.import', compact('bookings'));
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|mimes:csv,txt'
+        ]);
+
+        $file = $request->file('csv_file');
+        $handle = fopen($file, 'r');
+        $header = fgetcsv($handle);
+
+        $rows = [];
+        while (($data = fgetcsv($handle)) !== FALSE) {
+            $rows[] = array_combine($header, $data);
+        }
+        fclose($handle);
+
+        foreach ($rows as $row) {
+            $attendee = MeetingAttendee::create([
+                'name' => $row['name'],
+                'email' => $row['email'],
+                'phone' => $row['phone'],
+                'gender' => $row['gender'],
+                'department' => $row['department'],
+                'booking_id' => $request->booking_id,
+                'meeting_code' => $meeting_code = strtoupper(\Str::random(6)),
+                'status' => 'not_present',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Send the meeting code to the attendee's email
+            try {
+                \Mail::to($attendee->email)->queue(new \App\Mail\RegistrationConfirmation($attendee->name, $attendee->meeting_code));
+            } catch (\Exception $e) {
+                \Log::error('Failed to queue registration confirmation email: ' . $e->getMessage());
+                // Optionally, continue or collect errors for reporting
+            }
+        }
+
+        return redirect()->back()->with('success', 'Attendees imported successfully!');
+    }
+
+    public function downloadTemplate()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="attendees_template.csv"',
+        ];
+        $columns = ['name', 'gender', 'email', 'department', 'phone'];
+        $callback = function() use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fclose($file);
+        };
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function handleEnterCode(Request $request)
+    {
+        $request->validate([
+            'e_ticket' => 'required'
+        ]);
+        $e_ticket = strtoupper(trim($request->e_ticket));
+        $booking = \App\Models\Booking::where('e_ticket', $e_ticket)->first();
+
+        if ($booking) {
+            $booking->status = 'Started';
+            $booking->save();
+            return redirect()->route('admin.attendees.register-replica', ['id' => $booking->id]);
+        } else {
+            // Check if the code exists in booking history (meeting ended)
+            $history = \App\Models\BookingHistory::where('e_ticket', $e_ticket)->first();
+            if ($history) {
+                return back()->with('error', 'This meeting has ended. You cannot file forms for ended meetings.');
+            }
+            return back()->with('error', 'Invalid e-ticket.');
         }
     }
 }

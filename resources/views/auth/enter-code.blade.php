@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- CSS -->
     <link rel="stylesheet" href="/style.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>CocoaSpace</title>
 </head>
 <body>
@@ -16,68 +18,52 @@
             <div class="image-2"><img src="images/Waiting-pana 1.png" alt=""></div>
         </div>
         <div class="login-box">
-            <form method="POST" action="{{ route('login') }}">
+            <form method="POST" action="{{ route('enter.code.submit') }}">
                 @csrf
-
                 <div class="logo">
                         <img src="images/logo.jpg" alt="">
                         <h4>Welcome to</h4>
-                        <h4> Ghana Cocoa Board </h4>
-                    </div>
+                        <h4> Ghana Cocoa Board </h4><br><br>
                     <div class="login-notice">
-                        <h3>Login</h3>
-                        <p>Please login to proceed to your Dashboard</p>
-                    </div>
+                        <h3>Enter Meeting Code</h3>
+                        <p>Please enter your e-ticket or meeting code below to proceed to registration.</p>
+                    </div><br>
+                    
                     <div class="input-box">
-                        <input id="email" type="email" name="email" class="input-field @error('email') is-invalid @enderror" placeholder="Email" autocomplete="off" required>
-                        @error('email')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                    <div class="input-box">
-                        <input id="password" name="password" type="password" class="input-field @error('password') is-invalid @enderror" placeholder="Password" required autocomplete="current-password">
-                        @error('password')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
+                        <input type="text" name="e_ticket" id="e_ticket" class="input-field" placeholder="E-Ticket" required autofocus>
                     </div>
                     <div class="input-submit">
-                        <button type="submit" class="submit-btn" id="submit"> <label for="submit"> Sign In</label></button>
+                        <button type="submit" class="submit-btn">Submit</button>
                     </div>
                 </div>
             </form>
+            <div class="back-home-container">
+                <a href="{{ route('homepage') }}" class="back-home-btn"> <span><i class="fa-solid fa-arrow-left"></i></span> Back to Home</a>
+            </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-      document.querySelector('form[action="{{ route('login') }}"]').addEventListener('submit', function(e) {
+      document.querySelector('form[action="{{ route('enter.code.submit') }}"]').addEventListener('submit', function(e) {
         Swal.fire({
-          title: 'Signing in...',
-          text: 'Please wait while we log you in. Designed by Raymond Appiasi & Written-Right Ohene Kwame',
+          title: 'Processing...',
+          text: 'Please wait while we verify your code.',
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
           }
         });
       });
+
+      @if(session('error'))
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: '{{ session('error') }}',
+          confirmButtonColor: '#42ccc5',
+          confirmButtonText: 'OK'
+        });
+      @endif
     </script>
-    @if ($errors->any())
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Login Failed',
-                    text: '{{ $errors->first() }}',
-                    confirmButtonColor: '#42CCC5',
-                    background: '#fff',
-                    iconColor: '#dc2626'
-                });
-            });
-        </script>
-    @endif
 </body>
 </html>
 
@@ -177,7 +163,7 @@ body {
 }
 .login-notice {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 }
 .login-notice h3 {
     color: var(--primary-color);
@@ -218,6 +204,8 @@ body {
     border: none;
     transition: 0.2s;
     margin-top: 30px;
+    color: rgb(255, 255, 255);
+    font-weight: 600;
 }
 .submit-btn:hover {
     background-color: var(--hover-color);
@@ -309,5 +297,26 @@ body {
   .login-box {
     width: 100%;
   }
+}
+.back-home-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+}
+.back-home-btn {
+    display: inline-block;
+    padding: 10px 28px;
+    background: #42CCC5;
+    color: #fff;
+    border-radius: 30px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(34, 197, 194, 0.08);
+    transition: background 0.2s, color 0.2s;
+}
+.back-home-btn:hover {
+    background: #0f766e;
+    color: #fff;
 }
 </style>

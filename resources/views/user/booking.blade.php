@@ -199,6 +199,7 @@
                             <th>Time</th>
                             <th>Status</th>
                             <th>Meeting ID</th>
+                            <th>Decline Reason</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -231,6 +232,11 @@
                                         <span>{{ $booking->e_ticket }}</span>
                                     @else
                                         N/A
+                                    @endif
+                                </td>
+                                <td>
+                                    @if(strtolower($booking->status) === 'declined' && !empty($booking->decline_reason))
+                                        <span style="color:#d32f2f; font-weight:600;">{{ $booking->decline_reason }}</span>
                                     @endif
                                 </td>
                             </tr>

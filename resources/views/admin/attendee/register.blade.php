@@ -119,17 +119,11 @@
 
       .event-title {
         font-size: 2.2rem;
-        font-weight: 800;
-        margin-bottom: 5.3rem;
+        font-weight: none;
+        margin-bottom: 3rem;
         letter-spacing: -0.025em;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-
-      .event-subtitle {
-        font-size: 1rem;
-        font-weight: 500;
-        margin-bottom: 1rem;
-        opacity: 0.9;
+        line-height: 30px;
       }
 
       .event-image-container {

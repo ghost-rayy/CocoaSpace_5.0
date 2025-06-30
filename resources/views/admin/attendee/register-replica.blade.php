@@ -120,7 +120,7 @@
         bottom: 0;
         background:
           radial-gradient(
-            circle at 20% 20%,z
+            circle at 20% 20%,
             rgba(255, 255, 255, 0.1) 0%,
             transparent 50%
           ),
@@ -141,7 +141,7 @@
       }
 
       .event-title {
-        font-size: 2.2rem;
+        font-size: 1rem;
         font-weight: 600;
         letter-spacing: -0.025em;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -945,13 +945,24 @@
           transform: translateY(0);
         }
       }
+
+      .navigation button[title="Go Fullscreen"]:hover {
+        box-shadow: 0 4px 16px rgba(66,204,197,0.18);
+      }
     </style>
   </head>
   <body>
     <nav class="navigation">
-      <a href="{{ route('register.index') }}" class="nav-link">← Home</a>
-      <button onclick="enterFullscreen()" class="nav-links">Go Fullscreen</button>
+      <a href="{{ route('homepage') }}" class="nav-link">← Home</a>
     </nav>
+    <button onclick="enterFullscreen()" title="Go Fullscreen" id="fullscreen-btn" style="position:fixed; top:24px; right:32px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; background: none; border: none; box-shadow: none; transition: background 0.2s, box-shadow 0.2s; z-index:1100;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#42ccc5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+        <rect x="3" y="3" width="7" height="7"/>
+        <rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/>
+      </svg>
+    </button>
 
     <div class="registration-container">
       <!-- Event Details Section -->
@@ -1022,14 +1033,14 @@
                 </script>
             @endif
 
-            <form class="registration-form" action="{{ route('register.attendees.store') }}" method="POST" id="registerForm">
+            <form class="registration-form" action="{{ route('register.attendees.store-replica') }}" method="POST" id="registerForm">
             @csrf
                 <input type="hidden" name="booking_id" value="{{ $bookings->id }}">
                 <input type="hidden" name="registration_time" id="registration_time" value="">
 
                 <div class="form-row">
                 <div class="form-group">
-                  <label for="firstName" class="form-label">First Name *</label>
+                  <label for="firstName" class="form-label">Full Name *</label>
                   <input
                     type="text"
                     name="name"

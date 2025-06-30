@@ -47,12 +47,12 @@ class LoginController extends Controller
         switch ($user->role) {
             case 'admin':
                 return '/admin/home';
-            case 'user':
+            case 'staff':
                 return route('booking.create');
             case 'register':
                 return '/register/index';
             default:
-                return '/';
+                return '/homepage';
         }
     }
 }

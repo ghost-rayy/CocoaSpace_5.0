@@ -24,6 +24,7 @@ class BookingHistory extends Model
         'status',
         'e_ticket',
         'meeting_ended',
+        'decline_reason',
     ];
 
     public function meetingRoom()

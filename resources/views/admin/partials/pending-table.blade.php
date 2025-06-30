@@ -5,28 +5,28 @@
         <table class="fl-table">
             <thead>
                 <tr>
-                    <th>Requester / Title</th>
-                    <th>Duration</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Extension</th>
-                    <th>Reason</th>
-                    <th>Capacity</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th style="text-align: left">Requester / Title</th>
+                    <th style="text-align: left">Duration</th>
+                    <th style="text-align: left">Date</th>
+                    <th style="text-align: left">Time</th>
+                    <th style="text-align: left">Extension</th>
+                    <th style="text-align: left">Reason</th>
+                    <th style="text-align: left">Capacity</th>
+                    <th style="text-align: left">Status</th>
+                    <th style="text-align: left">Action</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($pendingBookings as $booking)
                     <tr>
-                        <td>{{ $booking->requester }}</td>
-                        <td>{{ $booking->duration }}</td>
-                        <td>{{ $booking->date }}</td>
-                        <td>{{ $booking->time }}</td>
-                        <td>{{ $booking->extension }}</td>
-                        <td>{{ $booking->reason }}</td>
-                        <td>{{ $booking->capacity }}</td>
-                        <td>
+                        <td style="text-align: left">{{ $booking->requester }}</td>
+                        <td style="text-align: left">{{ $booking->duration }}</td>
+                        <td style="text-align: left">{{ $booking->date }}</td>
+                        <td style="text-align: left">{{ $booking->time }}</td>
+                        <td style="text-align: left">{{ $booking->extension }}</td>
+                        <td style="text-align: left">{{ $booking->reason }}</td>
+                        <td style="text-align: left">{{ $booking->capacity }}</td>
+                        <td style="text-align: left">
                             <form action="{{ route('admin.bookings.updateStatus', $booking->id) }}" method="POST">
                                 @csrf
                                 <select name="status" class="form-select" onchange="this.form.submit()">
@@ -36,7 +36,7 @@
                                 </select>
                             </form>
                         </td>
-                        <td>
+                        <td style="text-align: left">
                             <span class="badge bg-{{ $booking->status == 'Approved' ? 'success' : ($booking->status == 'Declined' ? 'danger' : 'warning') }}">
                                 {{ $booking->status }}
                             </span>

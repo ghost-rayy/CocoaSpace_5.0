@@ -142,7 +142,7 @@ class AdminController extends Controller
         $user->staff_id = $request->staff_id;
         $user->department = $request->department;
         $user->office_number = $request->office_number;
-        $user->role = $request->role; // Default to staff if not set
+        $user->role = $request->role;
         $user->password = bcrypt($request->password);
         $user->save();
 
@@ -177,8 +177,25 @@ class AdminController extends Controller
 
         if ($request->status === 'Approved') {
             $booking->e_ticket = $booking->generateETicket();
-        }else {
-            $booking->e_ticket = null;
+        } else if ($request->status === 'Declined') {
+            // Move to booking_histories
+            \App\Models\BookingHistory::create([
+                'meeting_room_id' => $booking->meeting_room_id,
+                'user_id' => $booking->user_id,
+                'requester' => $booking->requester,
+                'date' => $booking->date,
+                'time' => $booking->time,
+                'duration' => $booking->duration,
+                'extension' => $booking->extension,
+                'reason' => $booking->reason,
+                'capacity' => $booking->capacity,
+                'status' => 'Declined',
+                'e_ticket' => $booking->e_ticket,
+                'meeting_ended' => $booking->meeting_ended,
+                'decline_reason' => $request->decline_reason,
+            ]);
+            $booking->delete();
+            return redirect()->route('admin.bookings')->with('success', 'Booking declined and moved to history.');
         }
 
         $booking->save();
@@ -213,8 +230,7 @@ class AdminController extends Controller
     public function approve($id)
     {
         $booking = Booking::findOrFail($id);
-        $booking->update(['status' => 'Approved']);
-
+        $booking->update(['status' => 'Not Started']);
         return redirect()->route('admin.bookings')->with('success', 'Booking Approved');
     }
 

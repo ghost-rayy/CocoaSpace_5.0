@@ -303,11 +303,11 @@
                             <i class="fa-solid fa-address-card"></i> Registration
                         </a>
                     </li>
-                    <li class="{{ request()->is('requests') ? 'active' : '' }}">
+                    {{-- <li class="{{ request()->is('requests') ? 'active' : '' }}">
                         <a href="{{ route('admin.requests')}}">
                             <i class="fa-solid fa-list"></i> Requests
                         </a>
-                    </li>
+                    </li> --}}
                     <li class="{{ request()->is('admin/dashboard') ? 'active' : '' }}">
                         <a href="{{ route('admin.dashboard')}}">
                             <i class="fa-solid fa-users"></i> Users

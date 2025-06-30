@@ -3,12 +3,23 @@
 @section('content')
 <div style="padding: 24px; background: #ffffff; min-height: 81vh; margin-top:-20px">
     @php
+        $totalRooms = $rooms->count();
+
         $bookedRooms = $rooms->filter(function($room) {
             return $room->bookings->count() > 0;
         })->count();
 
-        $availableRooms = $rooms->count() - $bookedRooms;
+        $availableRooms = $totalRooms - $bookedRooms;
+
+        if ($totalRooms > 0) {
+            $availablePercent = round(($availableRooms / $totalRooms) * 100, 1);
+            $bookedPercent = round(($bookedRooms / $totalRooms) * 100, 1);
+        } else {
+            $availablePercent = 0;
+            $bookedPercent = 0;
+        }
     @endphp
+
     <div style="display: flex; gap: 24px; align-items: flex-start;">
         <!-- Left Column: Stats and Chart -->
         <div style="flex: 2; display: flex; flex-direction: column; gap: 24px;">
@@ -18,36 +29,42 @@
                 <div style="background: #E3F5FF; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.08); display: flex; flex-direction: column; justify-content: center; height: 100%; width: 100%; min-width: 340px; max-width: 520px;">
                     <div style="font-size: 15px; color: #333; font-weight: 600; margin-bottom: 12px;">Room Status</div>
                     <div style="display: flex; flex-direction: column; gap: 18px;">
+                
                         <!-- Available Rooms Bar -->
                         <div style="display: flex; align-items: center; gap: 18px;">
                             <span style="width: 120px; font-size: 15px; color: #333;">Available rooms</span>
                             <div style="flex: 1; background: #ffffff; border-radius: 0px; height: 18px; position: relative; overflow: hidden;">
-                                <div style="background:rgba(73, 226, 219, 0.786); height: 100%; width: {{ ($availableRooms / ($availableRooms + $bookedRooms)) * 100 }}%; border-radius: 0px; display: flex; align-items: center;">
+                                <div style="background: rgba(73, 226, 219, 0.786); height: 100%; width: {{ $availablePercent }}%; border-radius: 0px; display: flex; align-items: center;">
                                     <span style="color: #fff; font-weight: 600; font-size: 10px; padding-left: 5px; text-shadow: 0 1px 2px rgba(0,0,0,0.08);">
-                                        {{ round($availableRooms / ($availableRooms + $bookedRooms) * 100, 1) }}% ({{ $availableRooms }})
+                                        {{ $availablePercent }}% ({{ $availableRooms }})
                                     </span>
                                 </div>
                             </div>
                         </div>
+                
                         <!-- Booked Rooms Bar -->
                         <div style="display: flex; align-items: center; gap: 18px;">
                             <span style="width: 120px; font-size: 15px; color: #333;">Booked rooms</span>
                             <div style="flex: 1; background: #ffffff; border-radius: 0px; height: 18px; position: relative; overflow: hidden;">
-                                <div style="background: #ff0303; height: 100%; width: {{ ($bookedRooms / ($availableRooms + $bookedRooms)) * 100 }}%; border-radius: 0px; display: flex; align-items: center;">
+                                <div style="background: #ff0303; height: 100%; width: {{ $bookedPercent }}%; border-radius: 0px; display: flex; align-items: center;">
                                     <span style="color: #fff; font-weight: 600; font-size: 10px; padding-left:5px; text-shadow: 0 1px 2px rgba(0,0,0,0.08);">
-                                        {{ round($bookedRooms / ($availableRooms + $bookedRooms) * 100, 1) }}% ({{ $bookedRooms }})
+                                        {{ $bookedPercent }}% ({{ $bookedRooms }})
                                     </span>
                                 </div>
                             </div>
                         </div>
+                
                     </div>
-                    <div style="font-size: 13px; color: #6c757d; margin-top: 18px; text-align: right;">Total rooms: {{ $availableRooms + $bookedRooms }}</div>
+                    <div style="font-size: 13px; color: #6c757d; margin-top: 18px; text-align: right;">
+                        Total rooms: {{ $totalRooms }}
+                    </div>
                 </div>
+                
                 <!-- Pending Bookings -->
                 <div style="flex: 1; background: #42CCC5; border-radius: 12px; padding: 20px; color: white; box-shadow: 0 2px 8px rgb(0 0 0 / 0.08); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; min-width: 200px;">
                     <div style="font-weight: 700; margin-bottom: 5px; font-size: 18px;">Pending Bookings</div>
                     <div style="font-size: 32px; font-weight: 700;">{{ $pendingBookings }}</div>
-                    <a href="{{ route('admin.requests') }}" style="background: white; color: #42CCC5; padding: 6px 18px; border-radius: 6px; font-weight: 600; font-size: 15px; text-decoration: none; margin-top: 10px;">View</a>
+                    <a href="{{ route('admin.bookings') }}" style="background: white; color: #42CCC5; padding: 6px 18px; border-radius: 6px; font-weight: 600; font-size: 15px; text-decoration: none; margin-top: 10px;">View</a>
                 </div>
                 <!-- Total Users -->
                 <div style="flex: 1; background: #E3F5FF; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.08); min-width: 180px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start;">

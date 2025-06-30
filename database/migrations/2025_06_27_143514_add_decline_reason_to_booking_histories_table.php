@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('bookings', function (Blueprint $table) {
-            $table->unsignedBigInteger('meeting_room_id')->after('user_id');
-            $table->foreign('meeting_room_id')->references('id')->on('meeting_rooms')->onDelete('cascade');        });
+        Schema::table('booking_histories', function (Blueprint $table) {
+            $table->string('decline_reason')->nullable()->after('meeting_ended');
+        });
     }
 
     /**
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('bookings', function (Blueprint $table) {
-            //
+        Schema::table('booking_histories', function (Blueprint $table) {
+            $table->dropColumn('decline_reason');
         });
     }
 };

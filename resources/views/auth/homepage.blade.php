@@ -1,3 +1,105 @@
+{{-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome Back</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #fff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 45px 30px;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+        }
+
+        .container h2 {
+            font-size: 2rem;
+            color: #1e88e5;
+            margin-bottom: 15px;
+        }
+
+        .container p {
+            font-size: 1rem;
+            color: #444;
+            margin-bottom: 30px;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+
+        .btn-login {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .btn-login:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-meeting {
+            background-color: #43a047;
+            color: #fff;
+        }
+
+        .btn-meeting:hover {
+            background-color: #2e7d32;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome Back!</h2>
+        <p>You’re almost there.<br>Choose an option below to continue.</p>
+
+        <div class="actions">
+            <a href="{{ route('login') }}" class="btn btn-login">Login</a>
+            <a href="{{ url('/enter-code') }}" class="btn btn-meeting">Enter Meeting Code</a>
+        </div>
+    </div>
+</body>
+</html> --}}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,39 +118,20 @@
             <div class="image-2"><img src="images/Waiting-pana 1.png" alt=""></div>
         </div>
         <div class="login-box">
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
-
-                <div class="logo">
-                        <img src="images/logo.jpg" alt="">
-                        <h4>Welcome to</h4>
-                        <h4> Ghana Cocoa Board </h4>
-                    </div>
-                    <div class="login-notice">
-                        <h3>Login</h3>
-                        <p>Please login to proceed to your Dashboard</p>
-                    </div>
-                    <div class="input-box">
-                        <input id="email" type="email" name="email" class="input-field @error('email') is-invalid @enderror" placeholder="Email" autocomplete="off" required>
-                        @error('email')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                    <div class="input-box">
-                        <input id="password" name="password" type="password" class="input-field @error('password') is-invalid @enderror" placeholder="Password" required autocomplete="current-password">
-                        @error('password')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                    <div class="input-submit">
-                        <button type="submit" class="submit-btn" id="submit"> <label for="submit"> Sign In</label></button>
-                    </div>
+            <div class="logo">
+                    <img src="images/logo.jpg" alt="">
+                    <h4>Welcome to</h4>
+                    <h4> Ghana Cocoa Board </h4>
                 </div>
-            </form>
+                <div class="login-notice">
+                    <p>You’re almost there.<br>Choose an option below to continue.</p>
+                </div>
+
+                <div class="actions">
+                    <a href="{{ route('login') }}" class="btn btn-login">Login</a>
+                    <a href="{{ url('/enter-code') }}" class="btn btn-meeting">Enter Meeting Code</a>
+                </div>
+            </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -64,20 +147,6 @@
         });
       });
     </script>
-    @if ($errors->any())
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Login Failed',
-                    text: '{{ $errors->first() }}',
-                    confirmButtonColor: '#42CCC5',
-                    background: '#fff',
-                    iconColor: '#dc2626'
-                });
-            });
-        </script>
-    @endif
 </body>
 </html>
 
@@ -104,6 +173,51 @@
     --transition-3s: 3s;
     --shadow-color: rgba(0, 0, 0, 0.1);
 
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.btn {
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    padding-left:100px;
+    padding-right:100px;
+    transition: 0.2s;
+    margin-top: 20px;
+}
+
+.btn-login {
+    background-color: #42ccc5;
+    color: #fff;
+    text-align: center;
+}
+
+.btn-login:hover {
+    background-color: #0056b3;
+    transform: scale(1.09);
+}
+
+.btn-meeting {
+    background-color: #ffffff;
+    color: #42ccc5;
+    box-shadow: 0px 0px 8px 8px var(--shadow-color);
+}
+
+.btn-meeting:hover {
+    background-color: #cdcdc8;
+    transform: scale(1.09);
 }
 
 /* REUSABLE ELEMENTS */

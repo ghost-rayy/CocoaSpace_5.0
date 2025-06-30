@@ -28,6 +28,9 @@
                     style="padding: 8px 15px; background-color: #42CCC5; border: none; color: white; border-radius: 5px;">
                 🔍 Search
             </button>
+            <a href="{{ route('attendees.import.form') }}" class="btns" style="margin-left: 10px; display: flex; align-items: center; background: #0f766e; border-radius:10px;">
+                Import Attendees
+            </a>
         </form>
     </div>
 
@@ -189,26 +192,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 </style>
-
-<!-- Bulk Register Modal -->
-<div id="bulkRegisterModal" class="modal" style="display:none; position:fixed; z-index:2000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
-  <div class="modal-content" style="background:#fff; padding:30px 24px; border-radius:12px; width:95%; max-width:500px; position:relative;">
-    <span class="close" id="closeBulkModalBtn" style="position:absolute; top:10px; right:18px; font-size:28px; font-weight:700; cursor:pointer;">&times;</span>
-    <h2 style="margin-bottom:18px;">Bulk Register Attendees</h2>
-    <form id="bulkRegisterForm">
-      <input type="hidden" name="booking_id" id="bulk_booking_id">
-      <div id="attendeesFields">
-        <div class="attendee-row" style="display:flex; gap:8px; margin-bottom:10px;">
-          <input type="text" name="names[]" placeholder="Name" class="form-control" required style="flex:1;">
-          <input type="email" name="emails[]" placeholder="Email" class="form-control" required style="flex:1;">
-          <button type="button" class="remove-attendee" style="background:#ff0303; color:#fff; border:none; border-radius:4px; padding:0 8px;">-</button>
-        </div>
-      </div>
-      <button type="button" id="addAttendeeBtn" style="background:#42CCC5; color:#fff; border:none; border-radius:4px; padding:4px 12px; margin-bottom:12px;">+ Add More</button>
-      <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Register & Send Codes</button>
-    </form>
-  </div>
-</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

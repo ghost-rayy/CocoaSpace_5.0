@@ -25,7 +25,7 @@ class VerificationController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/staff/create/booking';
+    protected $redirectTo = '/session-expired';
 
     /**
      * Create a new controller instance.

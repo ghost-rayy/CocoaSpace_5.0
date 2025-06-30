@@ -21,7 +21,10 @@ return new class extends Migration
             $table->string('email');
             $table->string('department');
             $table->integer('phone');
+            $table->string('meeting_code')->nullable();
+            $table->enum('status', ['not_present', 'present'])->default('not_present');
             $table->timestamps();
+
 
             $table->foreign('booking_id')->references('id')->on('bookings')->onDelete('cascade');
         });
