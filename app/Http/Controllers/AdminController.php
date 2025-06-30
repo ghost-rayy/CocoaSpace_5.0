@@ -237,9 +237,25 @@ class AdminController extends Controller
     public function decline($id)
     {
         $booking = Booking::findOrFail($id);
-        $booking->update(['status' => 'Declined']);
+        
+        BookingHistory::create([
+            'meeting_room_id' => $booking->meeting_room_id,
+            'user_id' => $booking->user_id,
+            'requester' => $booking->requester,
+            'date' => $booking->date,
+            'time' => $booking->time,
+            'duration' => $booking->duration,
+            'extension' => $booking->extension,
+            'reason' => $booking->reason,
+            'capacity' => $booking->capacity,
+            'status' => 'Declined',
+            'e_ticket' => $booking->e_ticket,
+            'meeting_ended' => true
+        ]);
 
-        return redirect()->route('admin.bookings')->with('error', 'Booking Declined');
+        $booking->delete();
+
+        return redirect()->route('admin.bookings')->with('success', 'Booking declined and moved to history.');
     }
 
     public function index()
