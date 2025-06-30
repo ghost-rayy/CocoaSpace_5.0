@@ -952,9 +952,9 @@
     </style>
   </head>
   <body>
-    <nav class="navigation">
+    {{-- <nav class="navigation">
       <a href="{{ route('homepage') }}" class="nav-link">← Home</a>
-    </nav>
+    </nav> --}}
     <button onclick="enterFullscreen()" title="Go Fullscreen" id="fullscreen-btn" style="position:fixed; top:24px; right:32px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; background: none; border: none; box-shadow: none; transition: background 0.2s, box-shadow 0.2s; z-index:1100;">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#42ccc5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
         <rect x="3" y="3" width="7" height="7"/>
