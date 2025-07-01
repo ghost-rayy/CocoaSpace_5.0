@@ -12,6 +12,8 @@ use App\Mail\AttendeeRegistered;
 use Illuminate\Support\Str;
 use App\Models\MeetingAttendee as Attendee;
 use Illuminate\Support\Facades\Validator;
+use App\Models\BookingDocument;
+use App\Mail\VerificationConfirmation;
 
 class MeetingAttendeeController extends Controller
 {
@@ -111,8 +113,17 @@ class MeetingAttendeeController extends Controller
         if ($attendee) {
             $attendee->status = 'present';
             $attendee->save();
+            
+            $documents = BookingDocument::where('booking_id', $attendee->booking_id)->get();
+            $attachments = $documents->map(function($doc) {
+                return [
+                    'file' => storage_path('app/' . $doc->file_path),
+                    'name' => $doc->original_name,
+                ];
+            })->toArray();
+            \Mail::to($attendee->email)->queue(new VerificationConfirmation($attendee->name, $attachments));
             return back()->with('success', 'Verification successful! You are marked as present.');
-        } else {
+                } else {
             return back()->with('error', 'Invalid code or email.');
         }
     }
@@ -155,12 +166,10 @@ class MeetingAttendeeController extends Controller
                 'updated_at' => now(),
             ]);
 
-            // Send the meeting code to the attendee's email
             try {
                 \Mail::to($attendee->email)->queue(new \App\Mail\RegistrationConfirmation($attendee->name, $attendee->meeting_code));
             } catch (\Exception $e) {
                 \Log::error('Failed to queue registration confirmation email: ' . $e->getMessage());
-                // Optionally, continue or collect errors for reporting
             }
         }
 
@@ -202,5 +211,24 @@ class MeetingAttendeeController extends Controller
             }
             return back()->with('error', 'Invalid e-ticket.');
         }
+    }
+
+    public function documents($bookingId)
+    {
+        $documents = \App\Models\BookingDocument::where('booking_id', $bookingId)->get();
+        return response()->json($documents);
+    }
+
+    public function deleteDocument($id)
+    {
+        $doc = \App\Models\BookingDocument::findOrFail($id);
+        // Delete the file from storage
+        if (\Storage::disk('public')->exists(str_replace('booking_documents/', '', $doc->file_path))) {
+            \Storage::disk('public')->delete(str_replace('booking_documents/', '', $doc->file_path));
+        } elseif (\Storage::exists($doc->file_path)) {
+            \Storage::delete($doc->file_path);
+        }
+        $doc->delete();
+        return response()->json(['success' => true]);
     }
 }

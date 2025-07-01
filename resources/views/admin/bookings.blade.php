@@ -66,7 +66,7 @@
                         <td>{{ $booking->capacity }}</td>
                         <td>
                             @if(in_array($booking->status, ['Approved', 'Not Started', 'Declined', 'Started']))
-                                <span class="badge bg-info" style="font-size: 13px;">{{ $booking->status }}</span>
+                                <span style="font-size: 13px; color: #0ce462; font-weight: bold;">{{ $booking->status }}</span>
                             @else
                                 <form action="{{ route('admin.bookings.updateStatus', $booking->id) }}" method="POST" class="status-form">
                                     @csrf
@@ -100,7 +100,7 @@
                             @elseif($booking->meeting_ended)
                                 <span class="badge bg-secondary">Ended</span>
                             @elseif($booking->status == 'Approved' || $booking->status == 'Not Started')
-                                <span class="badge bg-warning">Not Started</span>
+                                <span style="font-size: 13px; color: #0ce462; font-weight: bold;">Not Started</span>
                             @else
                                 <span class="badge bg-{{ $booking->status == 'Declined' ? 'danger' : 'warning' }}">{{ $booking->status }}</span>
                             @endif

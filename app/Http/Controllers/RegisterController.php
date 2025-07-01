@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Services\AfricasTalkingService;
 use App\Mail\RegistrationConfirmation;
 use Illuminate\Support\Str;
+use App\Models\BookingDocument;
 
 class RegisterController extends Controller
 {
@@ -76,7 +77,15 @@ class RegisterController extends Controller
         // Mail::to($validated['email'])->queue(new RegistrationConfirmation($validated['name']));
 
         try {
-            Mail::to($attendee->email)->send(new RegistrationConfirmation($attendee->name, null));
+            // Fetch booking documents
+            $documents = BookingDocument::where('booking_id', $validated['booking_id'])->get();
+            $attachments = $documents->map(function($doc) {
+                return [
+                    'file' => storage_path('app/' . $doc->file_path),
+                    'name' => $doc->original_name,
+                ];
+            })->toArray();
+            Mail::to($attendee->email)->send(new RegistrationConfirmation($attendee->name, null, $attachments));
         } catch (\Exception $e) {
             \Log::error('Failed to queue registration confirmation email: ' . $e->getMessage());
             return back()->with('error', 'Failed to queue email: ' . $e->getMessage());
@@ -118,7 +127,15 @@ class RegisterController extends Controller
         // Mail::to($validated['email'])->queue(new RegistrationConfirmation($validated['name']));
 
         try {
-            Mail::to($attendee->email)->send(new RegistrationConfirmation($attendee->name, null));
+            // Fetch booking documents
+            $documents = BookingDocument::where('booking_id', $validated['booking_id'])->get();
+            $attachments = $documents->map(function($doc) {
+                return [
+                    'file' => storage_path('app/' . $doc->file_path),
+                    'name' => $doc->original_name,
+                ];
+            })->toArray();
+            Mail::to($attendee->email)->send(new RegistrationConfirmation($attendee->name, null, $attachments));
         } catch (\Exception $e) {
             \Log::error('Failed to queue registration confirmation email: ' . $e->getMessage());
             return back()->with('error', 'Failed to queue email: ' . $e->getMessage());

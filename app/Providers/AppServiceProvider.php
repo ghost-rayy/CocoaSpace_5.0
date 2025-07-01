@@ -40,5 +40,10 @@ class AppServiceProvider extends ServiceProvider
 
         // // Share with all views
         // View::share('availableRooms', $availableRooms);
+
+        // Share $rooms with the admin sidebar layout for the booking modal
+        \Illuminate\Support\Facades\View::composer('layouts.admin-sidebar', function ($view) {
+            $view->with('rooms', \App\Models\MeetingRoom::all());
+        });
     }
 }

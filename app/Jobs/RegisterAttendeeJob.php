@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Booking;
 use App\Models\MeetingAttendee;
+use App\Models\BookingDocument;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -54,7 +55,15 @@ class RegisterAttendeeJob implements ShouldQueue
         ]);
 
         if ($attendee) {
-            Mail::to($this->email)->send(new RegistrationConfirmation($this->name, $meeting_code));
+            // Fetch booking documents
+            $documents = BookingDocument::where('booking_id', $this->bookingId)->get();
+            $attachments = $documents->map(function($doc) {
+                return [
+                    'file' => storage_path('app/' . $doc->file_path),
+                    'name' => $doc->original_name,
+                ];
+            })->toArray();
+            Mail::to($this->email)->send(new RegistrationConfirmation($this->name, $meeting_code, $attachments));
         }
     }
 } 

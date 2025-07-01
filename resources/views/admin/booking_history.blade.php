@@ -76,8 +76,7 @@
 
 <style>
     .table-wrapper {
-        max-height: 700px;
-        overflow-y: auto;
+        max-height: auto;
         overflow-x: hidden;
         border: 1px solid #ddd;
         border-radius: 8px;

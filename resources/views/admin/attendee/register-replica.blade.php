@@ -1106,7 +1106,7 @@
         </div>
       </div>
     </div>
-  <!-- Verification Modal -->
+  <!-- Verificatio Modal -->
   <div id="verifyModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>

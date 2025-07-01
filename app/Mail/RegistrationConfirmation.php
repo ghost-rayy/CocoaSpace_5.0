@@ -16,11 +16,13 @@ class RegistrationConfirmation extends Mailable implements ShouldQueue
 
     public $name;
     public $meeting_code;
+    public $attachments;
 
-    public function __construct($name, $meeting_code)
+    public function __construct($name, $meeting_code, $attachments = [])
     {
         $this->name = $name;
         $this->meeting_code = $meeting_code;
+        $this->attachments = $attachments;
     }
 
     public function build()

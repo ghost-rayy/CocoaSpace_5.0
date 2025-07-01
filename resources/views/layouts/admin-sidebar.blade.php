@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <title>CocoaSpace</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
         :root {
@@ -318,6 +319,16 @@
                             <i class="fas fa-door-closed"></i> History
                         </a>
                     </li>
+                    <li>
+                        <a href="#" id="openSidebarBookModal">
+                            <i class="fa-solid fa-plus"></i> Book Meeting Room
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" id="openSidebarAttachModal">
+                            <i class="fa-solid fa-paperclip"></i> Attach Document
+                        </a>
+                    </li>
                     <li class="sign-out">
                         <a href="{{ route('logout') }}" onclick="confirmLogout(event)">
                             <i class="fa-solid fa-right-from-bracket"></i> {{ __('Logout') }}
@@ -333,6 +344,24 @@
         <main class="main">
             @yield('content')
         </main>
+    </div>
+
+    <div id="sidebarBookMeetingModal" class="modal" style="display:none; position:fixed; z-index:2000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); align-items:center; justify-content:center;">
+        <div class="modal-content" style="background:#fff; border-radius:12px; padding:32px; max-width:420px; margin:auto; position:relative;">
+            <span class="close" id="closeSidebarBookModal" style="position:absolute; top:12px; right:18px; font-size:28px; cursor:pointer;">&times;</span>
+            <h2 style="margin-bottom:18px;">Book a Meeting Room</h2>
+            @include('admin.partials.booking_form', ['rooms' => $rooms])
+        </div>
+    </div>
+
+    <div id="sidebarAttachDocumentModal" class="modal" style="display:none; position:fixed; z-index:2000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); align-items:center; justify-content:center;">
+        <div class="modal-content" style="background:#fff; border-radius:12px; padding:32px; max-width:480px; margin:auto; position:relative; min-width:320px;">
+            <span class="close" id="closeSidebarAttachModal" style="position:absolute; top:12px; right:18px; font-size:28px; cursor:pointer;">&times;</span>
+            <h2 style="margin-bottom:18px;">Attach Document to Booking</h2>
+            <div id="attachDocumentFormContainer">
+                <!-- The form wil be loaded here via AJAX -->
+            </div>
+        </div>
     </div>
 
     <script>
@@ -384,6 +413,48 @@
             if (window.innerWidth > 1024) {
                 sidebar.classList.remove('active');
                 overlay.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var modal = document.getElementById('sidebarBookMeetingModal');
+            var openBtn = document.getElementById('openSidebarBookModal');
+            var closeBtn = document.getElementById('closeSidebarBookModal');
+            if (openBtn && modal && closeBtn) {
+                openBtn.onclick = function(e) {
+                    e.preventDefault();
+                    modal.style.display = 'flex';
+                };
+                closeBtn.onclick = function() {
+                    modal.style.display = 'none';
+                };
+            }
+        });
+
+        // Sidebar Attach Document Modal logic
+        document.addEventListener('DOMContentLoaded', function () {
+            var attachModal = document.getElementById('sidebarAttachDocumentModal');
+            var openAttachBtn = document.getElementById('openSidebarAttachModal');
+            var closeAttachBtn = document.getElementById('closeSidebarAttachModal');
+            var formContainer = document.getElementById('attachDocumentFormContainer');
+            if (openAttachBtn && attachModal && closeAttachBtn && formContainer) {
+                openAttachBtn.onclick = function(e) {
+                    e.preventDefault();
+                    // Load the form via AJAX
+                    fetch("{{ route('admin.attach-document') }}", {
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                        .then(response => response.text())
+                        .then(html => {
+                            formContainer.innerHTML = html;
+                            attachModal.style.display = 'flex';
+                        });
+                };
+                closeAttachBtn.onclick = function() {
+                    attachModal.style.display = 'none';
+                };
             }
         });
     </script>

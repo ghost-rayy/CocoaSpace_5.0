@@ -76,13 +76,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/attendees/register/{id}', [MeetingAttendeeController::class, 'showRegistrationForm'])->name('admin.attendees.register');
     Route::post('/attendees/store', [MeetingAttendeeController::class, 'store'])->name('admin.attendees.store');
     Route::get('/admin/attendees/view/{id}', [MeetingAttendeeController::class, 'viewAttendees'])->name('admin.attendees.view');
-    Route::post('/register/attendees/verify', [MeetingAttendeeController::class, 'verify'])->name('register.attendees.verify');
 
     // Protect admin attendee import and template download routes
     Route::get('/admin/attendees/import', [MeetingAttendeeController::class, 'showImportForm'])->name('attendees.import.form');
     Route::post('/admin/attendees/import', [MeetingAttendeeController::class, 'import'])->name('attendees.import');
     Route::get('/admin/attendees/download-template', [MeetingAttendeeController::class, 'downloadTemplate'])->name('attendees.download.template');
+
+    // Attach document to booking (admin sidebar)
+    Route::get('/admin/attach-document', [App\Http\Controllers\AdminController::class, 'showAttachDocument'])->name('admin.attach-document');
+    Route::post('/admin/upload-document', [App\Http\Controllers\AdminController::class, 'uploadBookingDocument'])->name('admin.upload-document');
 });
+Route::post('/register/attendees/verify', [App\Http\Controllers\MeetingAttendeeController::class, 'verify'])->name('register.attendees.verify');
+
 
 Route::middleware(['auth', 'role:register'])->group(function () {
     Route::get('/register/index', [RegisterController::class, 'index'])->name('register.index');
@@ -104,3 +109,9 @@ Route::post('/enter-code', [App\Http\Controllers\MeetingAttendeeController::clas
 
 Route::get('/register/attendees/register-/{id}', [App\Http\Controllers\RegisterController::class, 'showRegistrationReplicaForm'])->name('admin.attendees.register-replica');
 Route::post('/register/attendees/store', [RegisterController::class, 'storeReplica'])->name('register.attendees.store-replica');
+
+// Public route to fetch documents for a booking (AJAX)
+Route::get('/booking/{booking}/documents', [App\Http\Controllers\MeetingAttendeeController::class, 'documents'])->name('booking.documents');
+
+// Route to delete a booking document
+Route::delete('/booking/document/{id}', [App\Http\Controllers\MeetingAttendeeController::class, 'deleteDocument'])->name('booking.document.delete');

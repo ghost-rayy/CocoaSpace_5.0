@@ -16,6 +16,7 @@ use App\Events\BookingRequested;
 use App\Mail\AttendeeRegistered;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RegistrationConfirmation;
+use App\Models\BookingDocument;
 
 
 class AdminController extends Controller
@@ -354,27 +355,30 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'This meeting room is already booked at the selected time.');
         }
 
+        // Determine status based on user role
+        $status = 'Pending';
+        if (auth()->user()->role === 'admin' || auth()->user()->is_admin) {
+            $status = 'Approved';
+        }
+
         $booking = Booking::create([
-
             'meeting_room_id' => $request->meeting_room_id,
-
             'user_id' => Auth::id(),
-
             'requester' => $request->requester,
-
             'date' => $request->date,
-
             'time' => $request->time,
-
             'duration' => $request->duration,
-
             'extension' => $request->extension,
-
             'reason' => $request->reason,
-
             'capacity' => $request->capacity,
-
+            'status' => $status,
         ]);
+
+        // If auto-approved, assign e-ticket
+        if ($status === 'Approved') {
+            $booking->e_ticket = $booking->generateETicket();
+            $booking->save();
+        }
 
         event(new BookingRequested($booking));
 
@@ -434,5 +438,33 @@ class AdminController extends Controller
             ->get();
 
         return view('admin.booking_history', compact('bookingHistories', 'search'));
+    }
+
+    /**
+     * Show the attach document modal (for sidebar modal, just needs bookings list)
+     */
+    public function showAttachDocument()
+    {
+        $bookings = Booking::orderBy('created_at', 'desc')->get();
+        return view('admin.attach_document', compact('bookings'));
+    }
+
+    public function uploadBookingDocument(Request $request)
+    {
+        $request->validate([
+            'booking_id' => 'required|exists:bookings,id',
+            'document' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png,psd,xls,xlsx,ppt,pptx|max:55120', 
+        ]);
+
+        $file = $request->file('document');
+        $path = $file->store('booking_documents', 'public');
+
+        BookingDocument::create([
+            'booking_id' => $request->booking_id,
+            'file_path' => $path,
+            'original_name' => $file->getClientOriginalName(),
+        ]);
+
+        return back()->with('success', 'Document attached successfully!');
     }
 }

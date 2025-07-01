@@ -28,7 +28,7 @@
                     style="padding: 8px 15px; background-color: #42CCC5; border: none; color: white; border-radius: 5px;">
                 🔍 Search
             </button>
-            <a href="{{ route('attendees.import.form') }}" class="btns" style="margin-left: 10px; display: flex; align-items: center; background: #0f766e; border-radius:10px;">
+            <a href="{{ route('attendees.import.form') }}" class="btns" style="margin-left: 10px; display: flex; align-items: center; background: #0f766e; border-radius:5px;">
                 Import Attendees
             </a>
         </form>
@@ -72,6 +72,7 @@
                         <td>
                             <a href="{{ route('admin.attendees.register', $booking->id) }}" class="btns">Load</a>
                             <a href="{{ route('admin.attendees.view', $booking->id) }}" class="btns">View Attendance</a>
+                            <a href='#' class="btns view-documents-btn" data-booking-id="{{ $booking->id }}">View Documents</a>
                         </td>
                     </tr>
                 @empty
@@ -175,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
         background-color:#42CCC5; 
         padding:5px; 
         color:white;
+        border-radius: 5px;
     }
 
     /* Responsive Fixes */
@@ -265,5 +267,74 @@ document.addEventListener('DOMContentLoaded', function () {
       Swal.fire('Error', 'Something went wrong.', 'error');
     });
   };
+});
+</script>
+
+<!-- Modal for viewing documents -->
+<div id="documentsModal" style="display:none; position:fixed; z-index:3000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; padding:32px; max-width:420px; margin:auto; position:relative; min-width:320px;">
+        <span id="closeDocumentsModal" style="position:absolute; top:12px; right:18px; font-size:28px; cursor:pointer;">&times;</span>
+        <h2 style="margin-bottom:18px;">Booking Documents</h2>
+        <div id="documentsList">
+            <!-- Documents will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // View Documents modal logic
+    var modal = document.getElementById('documentsModal');
+    var closeBtn = document.getElementById('closeDocumentsModal');
+    var documentsList = document.getElementById('documentsList');
+    document.querySelectorAll('.view-documents-btn').forEach(function(btn) {
+        btn.onclick = function(e) {
+            e.preventDefault();
+            var bookingId = btn.getAttribute('data-booking-id');
+            fetch('/booking/' + bookingId + '/documents')
+                .then(response => response.json())
+                .then(docs => {
+                    if (docs.length === 0) {
+                        documentsList.innerHTML = '<p style="color:red;">No documents found for this booking.</p>';
+                    } else {
+                        documentsList.innerHTML = docs.map(function(doc) {
+                            return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
+                                '<a href="/storage/' + doc.file_path.replace('booking_documents/', 'booking_documents/') + '" target="_blank" style="color:#42CCC5; font-weight:600;">' + doc.original_name + '</a>' +
+                                '<span class="delete-doc-btn" data-doc-id="' + doc.id + '" style="cursor:pointer;margin-left:12px;color:#fff;background:#e3342f;border-radius:50%;padding:7px 10px;display:inline-block;">' +
+                                    '<i class="fa fa-trash"></i>' +
+                                '</span>' +
+                            '</div>';
+                        }).join('');
+                    }
+                    modal.style.display = 'flex';
+                });
+        };
+    });
+    closeBtn.onclick = function() {
+        modal.style.display = 'none';
+    };
+    // Delete document logic
+    documentsList.addEventListener('click', function(e) {
+        if (e.target.closest('.delete-doc-btn')) {
+            var btn = e.target.closest('.delete-doc-btn');
+            var docId = btn.getAttribute('data-doc-id');
+            if (confirm('Are you sure you want to delete this document?')) {
+                fetch('/booking/document/' + docId, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        btn.parentElement.remove();
+                    } else {
+                        alert('Failed to delete document.');
+                    }
+                });
+            }
+        }
+    });
 });
 </script>

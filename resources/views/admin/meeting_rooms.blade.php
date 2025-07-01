@@ -45,7 +45,7 @@
                         <form action="{{ route('admin.meeting_rooms.destroy', $room->id) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
-                            <button style="padding:5px; background-color:#42CCC5; text-decoration:none; color:white; border:none;" type="submit" class="btn btn-danger delete-room-btn">Delete</button>
+                            <button style="padding:5px; background-color:#db0000; text-decoration:none; color:white; border:none;" type="submit" class="btn btn-danger delete-room-btn">Delete</button>
                         </form>
                     </td>
                 </tr>
