@@ -86,6 +86,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/upload-document', [App\Http\Controllers\AdminController::class, 'uploadBookingDocument'])->name('admin.upload-document');
 
     Route::post('/admin/attendees/send-custom-email', [App\Http\Controllers\MeetingAttendeeController::class, 'sendCustomEmail'])->name('attendees.sendCustomEmail');
+    Route::post('/admin/attendees/register-ajax', [App\Http\Controllers\MeetingAttendeeController::class, 'registerAjax']);
 });
 Route::post('/register/attendees/verify', [App\Http\Controllers\MeetingAttendeeController::class, 'verify'])->name('register.attendees.verify');
 

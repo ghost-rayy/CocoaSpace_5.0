@@ -63,7 +63,7 @@ class RegisterAttendeeJob implements ShouldQueue
                     'name' => $doc->original_name,
                 ];
             })->toArray();
-            Mail::to($this->email)->send(new RegistrationConfirmation($this->name, $meeting_code, $attachments));
+            // Mail::to($this->email)->send(new RegistrationConfirmation($this->name, $meeting_code, $attachments));
         }
     }
 } 

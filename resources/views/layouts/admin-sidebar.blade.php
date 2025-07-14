@@ -323,12 +323,12 @@
                         <a href="#" id="openSidebarBookModal">
                             <i class="fa-solid fa-plus"></i> Book Meeting Room
                         </a>
-                    </li>
-                    <li>
+                    </li><br><br>
+                    {{-- <li>
                         <a href="#" id="openSidebarAttachModal">
                             <i class="fa-solid fa-paperclip"></i> Attach Document
                         </a>
-                    </li>
+                    </li> --}}
                     <li class="sign-out">
                         <a href="{{ route('logout') }}" onclick="confirmLogout(event)">
                             <i class="fa-solid fa-right-from-bracket"></i> {{ __('Logout') }}

@@ -167,7 +167,6 @@ document.getElementById('csv_file').addEventListener('change', function(e) {
     reader.readAsText(file);
 });
 
-// Intercept import form submission to show the compose modal after import
 const importForm = document.querySelector('form[action="{{ route('attendees.import') }}"]');
 if (importForm) {
   importForm.addEventListener('submit', function(e) {

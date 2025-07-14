@@ -53,6 +53,7 @@ class MeetingAttendeeController extends Controller
             'meeting_code' => $meeting_code,
             'status' => 'not_present',
         ]);
+
         if (!$attendee) {
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'error' => 'Failed to register attendee.']);
@@ -63,6 +64,7 @@ class MeetingAttendeeController extends Controller
         if ($request->ajax()) {
             return response()->json(['success' => true, 'attendee' => $attendee]);
         }
+        
         $bookings = Booking::with('meetingRoom')->get();
         return redirect()->route('admin.attendees.register', $request->booking_id)->with('success', 'Attendee registered successfully!');
     }
@@ -285,6 +287,39 @@ class MeetingAttendeeController extends Controller
         }
 
         return back()->with('error', 'Please select a valid image file.');
+    }
+
+    public function registerAjax(Request $request)
+    {
+        $validated = $request->validate([
+            'booking_id' => 'required|exists:bookings,id',
+            'name' => 'required|string|max:255',
+            'gender' => 'required|in:Male,Female,Other',
+            'email' => 'required|email',
+            'department' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+        ]);
+
+        $meeting_code = strtoupper(Str::random(6));
+        $attendee = MeetingAttendee::create([
+            'booking_id' => $validated['booking_id'],
+            'name' => $validated['name'],
+            'gender' => $validated['gender'],
+            'email' => $validated['email'],
+            'department' => $validated['department'],
+            'phone' => $validated['phone'],
+            'meeting_code' => $meeting_code,
+            'status' => 'not_present',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'attendee' => [
+                'name' => $attendee->name,
+                'email' => $attendee->email,
+                'meeting_code' => $attendee->meeting_code,
+            ]
+        ]);
     }
 }
 

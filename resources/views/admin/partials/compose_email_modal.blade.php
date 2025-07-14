@@ -61,7 +61,11 @@ if(document.getElementById('composeEmailModal')) {
 
 const composeEmailForm = document.getElementById('composeEmailForm');
 if (composeEmailForm) {
-  composeEmailForm.addEventListener('submit', function(e) {
+  composeEmailForm.onsubmit = function(e) {
+    // Always update textarea with CKEditor content before sending
+    if (window.CKEDITOR && CKEDITOR.instances.body) {
+      document.getElementById('body').value = CKEDITOR.instances.body.getData();
+    }
     e.preventDefault();
     const formData = new FormData(composeEmailForm);
     const sendBtn = composeEmailForm.querySelector('button[type="submit"]');
@@ -104,12 +108,35 @@ if (composeEmailForm) {
         text: 'Failed to send email.'
       });
     });
-  });
+  };
 }
 </script>
 
 <style>
 .swal2-container {
   z-index: 20000 !important;
+}
+/* Style for To and Subject fields to match import-form-input */
+#composeEmailModal .form-control {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #42CCC5;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #f9fefe;
+  transition: border-color 0.2s;
+  margin-bottom: 10px;
+}
+#composeEmailModal .form-control:focus {
+  border-color: #14b8a6;
+  outline: none;
+  background: #fff;
+}
+#composeEmailModal label {
+  color: #333;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
 }
 </style> 

@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>CocoaSpace</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
@@ -905,7 +906,7 @@
             @endif
 
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
+            {{-- <script>
             document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('form').forEach(function(form) {
                     form.addEventListener('submit', function(e) {
@@ -920,9 +921,9 @@
                     });
                 });
             });
-            </script>
+            </script> --}}
 
-            <form class="registration-form" action="{{ route('admin.attendees.store') }}" method="POST" id="registerForm">
+            <form class="registration-form" action="/admin/attendees/register-ajax" method="POST" id="registerForm">
             @csrf
                 <input type="hidden" name="booking_id" value="{{ $bookings->id }}">
                 <input type="hidden" name="registration_time" id="registration_time" value="">
@@ -995,12 +996,54 @@
         </div>
       </div>
     </div>
+    @include('admin.partials.compose_email_modal')
+    <script>
+// Clean AJAX-only registration handler for #registerForm
+const registerForm = document.getElementById('registerForm');
+if (registerForm) {
+  registerForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(registerForm);
+    formData.set('registration_time', new Date().toISOString());
+    fetch(registerForm.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.attendee) {
+        showComposeEmailModal(data.attendee.email);
+        setTimeout(function() {
+          var recipientsInput = document.getElementById('recipients');
+          if (recipientsInput && !recipientsInput.value) {
+            recipientsInput.value = data.attendee.email;
+          }
+        }, 100);
+        if (window.CKEDITOR && CKEDITOR.instances.body) {
+          let body = CKEDITOR.instances.body.getData();
+          body = body.replace(/\[Name\]/g, data.attendee.name);
+          body = body.replace(/\[Meeting Code\]/g, data.attendee.meeting_code);
+          CKEDITOR.instances.body.setData(body);
+        }
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message || 'Registration failed.'
+        });
+      }
+    })
+    .catch(() => Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Registration failed.'
+    }));
+  });
+}
+</script>
   </body>
-  <script>
-    document.getElementById('registerForm').addEventListener('submit', function() {
-      const now = new Date();
-      const isoString = now.toISOString();
-      document.getElementById('registration_time').value = isoString;
-    });
-  </script>
 </html>
