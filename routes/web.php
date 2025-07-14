@@ -77,14 +77,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/attendees/store', [MeetingAttendeeController::class, 'store'])->name('admin.attendees.store');
     Route::get('/admin/attendees/view/{id}', [MeetingAttendeeController::class, 'viewAttendees'])->name('admin.attendees.view');
 
-    // Protect admin attendee import and template download routes
     Route::get('/admin/attendees/import', [MeetingAttendeeController::class, 'showImportForm'])->name('attendees.import.form');
     Route::post('/admin/attendees/import', [MeetingAttendeeController::class, 'import'])->name('attendees.import');
     Route::get('/admin/attendees/download-template', [MeetingAttendeeController::class, 'downloadTemplate'])->name('attendees.download.template');
+    Route::post('/upload-flyer/{bookingId}', [MeetingAttendeeController::class, 'uploadFlyer'])->name('admin.uploadFlyer');
 
-    // Attach document to booking (admin sidebar)
     Route::get('/admin/attach-document', [App\Http\Controllers\AdminController::class, 'showAttachDocument'])->name('admin.attach-document');
     Route::post('/admin/upload-document', [App\Http\Controllers\AdminController::class, 'uploadBookingDocument'])->name('admin.upload-document');
+
+    Route::post('/admin/attendees/send-custom-email', [App\Http\Controllers\MeetingAttendeeController::class, 'sendCustomEmail'])->name('attendees.sendCustomEmail');
 });
 Route::post('/register/attendees/verify', [App\Http\Controllers\MeetingAttendeeController::class, 'verify'])->name('register.attendees.verify');
 

@@ -1,105 +1,3 @@
-{{-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Welcome Back</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #e0f7fa, #fff);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            background-color: #ffffff;
-            padding: 45px 30px;
-            border-radius: 18px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 420px;
-            width: 90%;
-        }
-
-        .container h2 {
-            font-size: 2rem;
-            color: #1e88e5;
-            margin-bottom: 15px;
-        }
-
-        .container p {
-            font-size: 1rem;
-            color: #444;
-            margin-bottom: 30px;
-        }
-
-        .actions {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .btn {
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            transition: 0.3s ease;
-            text-decoration: none;
-            display: block;
-        }
-
-        .btn-login {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .btn-login:hover {
-            background-color: #0056b3;
-        }
-
-        .btn-meeting {
-            background-color: #43a047;
-            color: #fff;
-        }
-
-        .btn-meeting:hover {
-            background-color: #2e7d32;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 25px;
-            }
-
-            .btn {
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Welcome Back!</h2>
-        <p>You’re almost there.<br>Choose an option below to continue.</p>
-
-        <div class="actions">
-            <a href="{{ route('login') }}" class="btn btn-login">Login</a>
-            <a href="{{ url('/enter-code') }}" class="btn btn-meeting">Enter Meeting Code</a>
-        </div>
-    </div>
-</body>
-</html> --}}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -205,7 +103,7 @@
 }
 
 .btn-login:hover {
-    background-color: #0056b3;
+    background-color: #228a85;
     transform: scale(1.09);
 }
 

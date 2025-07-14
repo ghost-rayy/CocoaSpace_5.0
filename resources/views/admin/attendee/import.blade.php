@@ -137,6 +137,7 @@
         <button type="submit" class="import-form-submit">Import</button>
     </form>
 </div>
+@include('admin.partials.compose_email_modal')
 <script>
 document.getElementById('csv_file').addEventListener('change', function(e) {
     const file = e.target.files[0];
@@ -165,5 +166,31 @@ document.getElementById('csv_file').addEventListener('change', function(e) {
     };
     reader.readAsText(file);
 });
+
+// Intercept import form submission to show the compose modal after import
+const importForm = document.querySelector('form[action="{{ route('attendees.import') }}"]');
+if (importForm) {
+  importForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(importForm);
+    fetch(importForm.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.attendees) {
+        showComposeEmailModal(data.attendees.map(a => a.email).join(', '));
+      } else {
+        alert('Import failed.');
+      }
+    })
+    .catch(() => alert('Import failed.'));
+  });
+}
 </script>
 @endsection

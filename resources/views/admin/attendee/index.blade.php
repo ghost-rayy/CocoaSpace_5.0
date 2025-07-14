@@ -72,7 +72,12 @@
                         <td>
                             <a href="{{ route('admin.attendees.register', $booking->id) }}" class="btns">Load</a>
                             <a href="{{ route('admin.attendees.view', $booking->id) }}" class="btns">View Attendance</a>
-                            <a href='#' class="btns view-documents-btn" data-booking-id="{{ $booking->id }}">View Documents</a>
+                            {{-- <a href='#' class="btns view-documents-btn" data-booking-id="{{ $booking->id }}">View Documents</a> --}}
+                            <form action="{{ route('admin.uploadFlyer', $booking->id) }}" method="POST" enctype="multipart/form-data" >
+                                @csrf
+                                <input type="file" name="flyer" accept="image/*" required id="flyer-{{ $booking->id }}" class="file-input">
+                                <label for="flyer-{{ $booking->id }}" class="btns" style="margin-top:10px; cursor:hand;">Upload Flyer</label>
+                            </form>
                         </td>
                     </tr>
                 @empty
@@ -95,6 +100,18 @@
             alert("E-Ticket copied!");
         });
     }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.file-input').forEach(function(input) {
+            input.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    this.closest('form').submit();
+                }
+            });
+        });
+    });
 </script>
 
 <script>
@@ -177,6 +194,21 @@ document.addEventListener('DOMContentLoaded', function() {
         padding:5px; 
         color:white;
         border-radius: 5px;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .upload-flyer-form {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        margin: 0;
+        background-color: #1f6d69;
+        border-radius: 8px;
+    }
+
+    .file-input {
+        display: none;
     }
 
     /* Responsive Fixes */

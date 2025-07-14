@@ -40,18 +40,7 @@ class MeetingAttendeeController extends Controller
 
     public function store(Request $request)
     {
-        // $validated = $request->validate([
-        //     'booking_id' => 'required|exists:bookings,id',
-        //     'name' => 'required|string|max:255',
-        //     'gender' => 'required|in:Male,Female,Other',
-        //     'email' => 'required|email',
-        //     'department' => 'required|string|max:255',
-        //     'phone' => 'required|string|max:20',
-        //     'registration_time' => 'required|date',
-        // ]);
-
-        $meeting_code = strtoupper(Str::random(6)); // e.g. 'A1B2C3'
-
+        $meeting_code = strtoupper(Str::random(6));
         $attendee = MeetingAttendee::create([
             'booking_id' => $request->booking_id, 
             'name' => $request->name,
@@ -64,21 +53,17 @@ class MeetingAttendeeController extends Controller
             'meeting_code' => $meeting_code,
             'status' => 'not_present',
         ]);
-
         if (!$attendee) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'error' => 'Failed to register attendee.']);
+            }
             return back()->with('error', 'Failed to register attendee.');
         }
-
-        try {
-            Mail::to($attendee->email)->queue(new RegistrationConfirmation($attendee->name, $attendee->meeting_code));
-        } catch (\Exception $e) {
-            \Log::error('Failed to queue registration confirmation email: ' . $e->getMessage());
-            return back()->with('error', 'Failed to queue email: ' . $e->getMessage());
+        // Do not send email here!
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'attendee' => $attendee]);
         }
-
         $bookings = Booking::with('meetingRoom')->get();
-
-        // return view('admin.attendee.index', compact('bookings'))->with('success', 'Attendee Registered Successfully');
         return redirect()->route('admin.attendees.register', $request->booking_id)->with('success', 'Attendee registered successfully!');
     }
 
@@ -141,17 +126,15 @@ class MeetingAttendeeController extends Controller
         $request->validate([
             'csv_file' => 'required|mimes:csv,txt'
         ]);
-
         $file = $request->file('csv_file');
         $handle = fopen($file, 'r');
         $header = fgetcsv($handle);
-
         $rows = [];
+        $attendees = [];
         while (($data = fgetcsv($handle)) !== FALSE) {
             $rows[] = array_combine($header, $data);
         }
         fclose($handle);
-
         foreach ($rows as $row) {
             $attendee = MeetingAttendee::create([
                 'name' => $row['name'],
@@ -165,14 +148,14 @@ class MeetingAttendeeController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-
-            try {
-                \Mail::to($attendee->email)->queue(new \App\Mail\RegistrationConfirmation($attendee->name, $attendee->meeting_code));
-            } catch (\Exception $e) {
-                \Log::error('Failed to queue registration confirmation email: ' . $e->getMessage());
+            if ($attendee) {
+                $attendees[] = $attendee;
             }
         }
-
+        // Do not send emails here!
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'attendees' => $attendees]);
+        }
         return redirect()->back()->with('success', 'Attendees imported successfully!');
     }
 
@@ -231,4 +214,77 @@ class MeetingAttendeeController extends Controller
         $doc->delete();
         return response()->json(['success' => true]);
     }
+
+    public function sendCustomEmail(Request $request)
+    {
+        $request->validate([
+            'recipients' => 'required|string',
+            'subject' => 'required|string',
+            'body' => 'required|string',
+            'attachments.*' => 'file|mimes:pdf,jpg,jpeg,png,doc,docx,txt|max:10240',
+        ]);
+        $recipients = array_map('trim', explode(',', $request->recipients));
+        $subject = $request->subject;
+        $body = $request->body;
+        $attachments = $request->file('attachments', []);
+        $failed = [];
+        foreach ($recipients as $recipient) {
+            // Find attendee by email
+            $attendee = \App\Models\MeetingAttendee::where('email', $recipient)->latest()->first();
+            $personalizedBody = $body;
+            if ($attendee) {
+                $personalizedBody = str_replace('[Name]', $attendee->name, $personalizedBody);
+                $personalizedBody = str_replace('[Meeting Code]', $attendee->meeting_code, $personalizedBody);
+            }
+            try {
+                \Mail::send([], [], function ($message) use ($recipient, $subject, $personalizedBody, $attachments) {
+                    $message->to($recipient)
+                        ->subject($subject)
+                        ->html($personalizedBody);
+                    if ($attachments) {
+                        foreach ($attachments as $file) {
+                            $message->attach($file->getRealPath(), [
+                                'as' => $file->getClientOriginalName(),
+                                'mime' => $file->getMimeType(),
+                            ]);
+                        }
+                    }
+                });
+            } catch (\Exception $e) {
+                $failed[] = $recipient;
+            }
+        }
+        if (count($failed)) {
+            return response()->json(['success' => false, 'failed' => $failed, 'message' => 'Some emails failed to send.']);
+        }
+        return response()->json(['success' => true, 'message' => 'Email(s) sent successfully.']);
+    }
+
+    public function uploadFlyer(Request $request, $bookingId)
+    {
+        $request->validate([
+            'flyer' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $booking = Booking::findOrFail($bookingId);
+
+        if ($request->hasFile('flyer')) {
+            // Delete old flyer file if exists
+            if ($booking->flyer_path && file_exists(public_path($booking->flyer_path))) {
+                unlink(public_path($booking->flyer_path));
+            }
+
+            $image = $request->file('flyer');
+            $imageName = time() . '_' . $bookingId . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('flyers'), $imageName);
+
+            $booking->flyer_path = 'flyers/' . $imageName;
+            $booking->save();
+
+            return redirect()->route('admin.registration')->with('success', 'Flyer uploaded successfully for booking ID ' . $bookingId);
+        }
+
+        return back()->with('error', 'Please select a valid image file.');
+    }
 }
+

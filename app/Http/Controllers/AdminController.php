@@ -49,10 +49,22 @@ class AdminController extends Controller
                     ->groupBy('time')
                     ->orderBy('time')
                     ->get();
-
+                $historyToday = BookingHistory::whereDate('date', now()->toDateString())
+                    ->select('time', \DB::raw('count(*) as count'))
+                    ->groupBy('time')
+                    ->orderBy('time')
+                    ->get();
+                $timeCounts = [];
                 foreach ($bookingsToday as $booking) {
-                    $labels[] = $booking->time;
-                    $data[] = $booking->count;
+                    $timeCounts[$booking->time] = ($timeCounts[$booking->time] ?? 0) + $booking->count;
+                }
+                foreach ($historyToday as $history) {
+                    $timeCounts[$history->time] = ($timeCounts[$history->time] ?? 0) + $history->count;
+                }
+                ksort($timeCounts);
+                foreach ($timeCounts as $time => $count) {
+                    $labels[] = $time;
+                    $data[] = $count;
                 }
                 break;
 
@@ -65,7 +77,8 @@ class AdminController extends Controller
                     $date = $startOfWeek->copy()->addDays($i);
                     $labels[] = $date->format('D');
                     $count = Booking::whereDate('date', $date->toDateString())->count();
-                    $data[] = $count;
+                    $historyCount = BookingHistory::whereDate('date', $date->toDateString())->count();
+                    $data[] = $count + $historyCount;
                 }
                 break;
 
@@ -78,7 +91,10 @@ class AdminController extends Controller
                     $count = Booking::whereYear('date', now()->year)
                         ->whereMonth('date', $month)
                         ->count();
-                    $data[] = $count;
+                    $historyCount = BookingHistory::whereYear('date', now()->year)
+                        ->whereMonth('date', $month)
+                        ->count();
+                    $data[] = $count + $historyCount;
                 }
                 break;
 
@@ -94,7 +110,11 @@ class AdminController extends Controller
                         ->whereMonth('date', now()->month)
                         ->whereDay('date', $day)
                         ->count();
-                    $data[] = $count;
+                    $historyCount = BookingHistory::whereYear('date', now()->year)
+                        ->whereMonth('date', now()->month)
+                        ->whereDay('date', $day)
+                        ->count();
+                    $data[] = $count + $historyCount;
                 }
                 break;
         }
