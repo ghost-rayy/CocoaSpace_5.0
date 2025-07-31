@@ -187,14 +187,24 @@ class MeetingAttendeeController extends Controller
         if ($booking) {
             $booking->status = 'Started';
             $booking->save();
-            return redirect()->route('admin.attendees.register-replica', ['id' => $booking->id]);
+            return response()->json([
+                'success' => true,
+                'booking' => $booking,
+                'message' => 'Meeting found successfully!'
+            ]);
         } else {
             // Check if the code exists in booking history (meeting ended)
             $history = \App\Models\BookingHistory::where('e_ticket', $e_ticket)->first();
             if ($history) {
-                return back()->with('error', 'This meeting has ended. You cannot file forms for ended meetings.');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This meeting has ended. You cannot file forms for ended meetings.'
+                ]);
             }
-            return back()->with('error', 'Invalid e-ticket.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid e-ticket.'
+            ]);
         }
     }
 
@@ -202,6 +212,12 @@ class MeetingAttendeeController extends Controller
     {
         $documents = \App\Models\BookingDocument::where('booking_id', $bookingId)->get();
         return response()->json($documents);
+    }
+
+    public function showInProgress($id)
+    {
+        $booking = Booking::with('meetingRoom')->findOrFail($id);
+        return view('admin.attendee.in-progress', compact('booking'));
     }
 
     public function deleteDocument($id)

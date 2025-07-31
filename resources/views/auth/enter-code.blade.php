@@ -43,17 +43,6 @@
         </div>
     </div>
     <script>
-      document.querySelector('form[action="{{ route('enter.code.submit') }}"]').addEventListener('submit', function(e) {
-        Swal.fire({
-          title: 'Processing...',
-          text: 'Please wait while we verify your code.',
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          }
-        });
-      });
-
       @if(session('error'))
         Swal.fire({
           icon: 'error',
@@ -63,6 +52,60 @@
           confirmButtonText: 'OK'
         });
       @endif
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const e_ticket = document.getElementById('e_ticket').value;
+          fetch(form.action, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+            },
+            body: JSON.stringify({ e_ticket })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                title: 'Meeting Found',
+                text: 'What would you like to do?',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Go to Register',
+                cancelButtonText: 'Go to In Progress',
+                confirmButtonColor: '#42ccc5',
+                cancelButtonColor: '#198984',
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/register/attendees/register-/${data.booking.id}`;
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                  window.location.href = `/meeting/in-progress/${data.booking.id}`;
+                }
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: data.message,
+                confirmButtonColor: '#42ccc5',
+                confirmButtonText: 'OK'
+              });
+            }
+          })
+          .catch(() => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error!',
+              text: 'An error occurred. Please try again.',
+              confirmButtonColor: '#42ccc5',
+              confirmButtonText: 'OK'
+            });
+          });
+        });
+      });
     </script>
 </body>
 </html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CocoaSpace</title>
+    <style>
+        html, body{
+            margin: 0;
+            height: 100%;
+        }
+
+        body{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
+            font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        .main{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #218a85;
+        }
+
+        .left{
+            background-image: url('/auth/1.png');
+            background-color: #fff;
+            background-size: cover;         /* or 'contain' depending on your preference */
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .right{
+            background-color: #198984;
+        }
+
+        .object1{
+            width: 500px;
+            height: 150px;
+            margin-top: 100px;
+        }
+
+        .line{
+            width: 550px;
+            height: 5px;
+            margin-top: 10px;
+            margin-bottom: -20px;
+            background-color: #1d8882;
+        }
+
+        .object3{
+            width: 400px;
+            height: 30px;
+            margin-bottom: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main left ">
+        <div>
+            <div class="object1">
+                <h1 style="font-size: 70px;">
+                    HR TRAINING ROOM
+                </h1>
+            </div>
+
+            <div class="line"></div>
+
+            <div class="object3">
+                <h3 id="currentDateTime"  style="font-size: 30px;">
+                    <!-- Will be filled by JS -->
+                </h3>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="main right">
+        <div>
+            <div>
+                <h3 style="color: white; font-size: 50px;">Ongoing Meeting</h3>
+            </div>
+
+            <div style="background-color: rgb(2, 255, 255); padding-left: 40px; width: 90%;  border-radius: 10px; ">
+                <h3  style="color: #1d8882; font-size: 40px; padding-top: 20px; padding-bottom: 20px;">9:00AM - 12:00PM</h3>
+            </div>
+
+            <div style="margin-bottom: 150px;">
+                <h3 style="color: #fff; font-size: 50px; width: 400px;">Cocobod Executive Meeting</h3>
+            </div>
+
+            <div style="border-radius: 30px; background-color: #fff; width: 52%;">
+                <h2 style="font-size: 40px; padding: 10px;">In Progress</h2>
+            </div>
+        </div>  
+    </div>
+</body>
+<script>
+    function formatAMPM(date) {
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        let minutesStr = minutes < 10 ? '0'+minutes : minutes;
+        return hours + ':' + minutesStr + ampm;
+    }
+    
+    function formatDate(date) {
+        const months = [
+            "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+            "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+        ];
+        return date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear();
+    }
+    
+    function updateDateTime() {
+        const now = new Date();
+        // Left panel: current time and date
+        document.getElementById('currentDateTime').textContent =
+            formatAMPM(now) + ' | ' + formatDate(now);
+    }
+    
+    updateDateTime();
+    setInterval(updateDateTime, 60000);
+</script>
+</html>

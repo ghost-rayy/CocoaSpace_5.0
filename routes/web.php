@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AttendeeController;
+use App\Http\Controllers\MeetingRoomController;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,9 +112,12 @@ Route::post('/enter-code', [App\Http\Controllers\MeetingAttendeeController::clas
 
 Route::get('/register/attendees/register-/{id}', [App\Http\Controllers\RegisterController::class, 'showRegistrationReplicaForm'])->name('admin.attendees.register-replica');
 Route::post('/register/attendees/store', [RegisterController::class, 'storeReplica'])->name('register.attendees.store-replica');
+Route::get('/meeting/in-progress/{id}', [App\Http\Controllers\MeetingAttendeeController::class, 'showInProgress'])->name('meeting.in-progress');
 
 // Public route to fetch documents for a booking (AJAX)
 Route::get('/booking/{booking}/documents', [App\Http\Controllers\MeetingAttendeeController::class, 'documents'])->name('booking.documents');
 
 // Route to delete a booking document
 Route::delete('/booking/document/{id}', [App\Http\Controllers\MeetingAttendeeController::class, 'deleteDocument'])->name('booking.document.delete');
+
+Route::get('/meeting-room/{code}', [MeetingRoomController::class, 'show'])->name('meeting.index');
