@@ -28,6 +28,7 @@
                         <th>Status</th>
                         <th>E-Ticket</th>
                         <th>Meeting Status</th>
+                        <th>Attendees</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,10 +61,17 @@
                             <td>
                                 <span class="badge bg-secondary">Ended</span>
                             </td>
+                            <td>
+                                <a href="{{ route('admin.attendees.view-history', $booking->id) }}" 
+                                   class="btn btn-sm btn-primary" 
+                                   style="background-color: #42CCC5; border: none; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 12px;">
+                                    👥 View Attendees
+                                </a>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" style="text-align: center; color: red; font-weight: bold;">
+                            <td colspan="12" style="text-align: center; color: red; font-weight: bold;">
                                 No booking history found for your search.
                             </td>
                         </tr>

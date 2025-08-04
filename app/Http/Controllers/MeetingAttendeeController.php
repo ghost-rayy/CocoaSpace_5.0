@@ -220,6 +220,75 @@ class MeetingAttendeeController extends Controller
         return view('admin.attendee.in-progress', compact('booking'));
     }
 
+    public function viewHistoryAttendees(Request $request, $id)
+    {
+        $bookingHistory = \App\Models\BookingHistory::with('meetingRoom')->findOrFail($id);
+        
+        $attendees = \App\Models\MeetingAttendee::where('booking_id', $bookingHistory->booking_id)
+            ->when($request->search, function ($query) use ($request) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('email', 'like', '%'.$request->search.'%')
+                    ->orWhere('phone', 'like', '%'.$request->search.'%');
+                });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('admin.attendee.view-history', compact('bookingHistory', 'attendees'));
+    }
+
+    public function exportExcel($id)
+    {
+        $bookingHistory = \App\Models\BookingHistory::with('meetingRoom')->findOrFail($id);
+        $attendees = \App\Models\MeetingAttendee::where('booking_id', $bookingHistory->booking_id)->get();
+
+        $filename = 'attendees_' . $bookingHistory->requester . '_' . $bookingHistory->date . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($attendees) {
+            $file = fopen('php://output', 'w');
+            
+            // Add headers
+            fputcsv($file, ['Name', 'Email', 'Phone', 'Department', 'Gender', 'Status', 'Registration Date']);
+            
+            // Add data
+            foreach ($attendees as $attendee) {
+                fputcsv($file, [
+                    $attendee->name,
+                    $attendee->email,
+                    $attendee->phone,
+                    $attendee->department,
+                    $attendee->gender,
+                    ucfirst($attendee->status),
+                    $attendee->created_at->format('M d, Y H:i')
+                ]);
+            }
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportPdf($id)
+    {
+        $bookingHistory = \App\Models\BookingHistory::with('meetingRoom')->findOrFail($id);
+        $attendees = \App\Models\MeetingAttendee::where('booking_id', $bookingHistory->booking_id)->get();
+
+        $filename = 'attendees_' . $bookingHistory->requester . '_' . $bookingHistory->date . '.html';
+        
+        $html = view('admin.attendee.export-pdf', compact('attendees', 'bookingHistory'))->render();
+        
+        return response($html)
+            ->header('Content-Type', 'text/html')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+    }
+
     public function deleteDocument($id)
     {
         $doc = \App\Models\BookingDocument::findOrFail($id);

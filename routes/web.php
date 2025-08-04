@@ -77,6 +77,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/attendees/register/{id}', [MeetingAttendeeController::class, 'showRegistrationForm'])->name('admin.attendees.register');
     Route::post('/attendees/store', [MeetingAttendeeController::class, 'store'])->name('admin.attendees.store');
     Route::get('/admin/attendees/view/{id}', [MeetingAttendeeController::class, 'viewAttendees'])->name('admin.attendees.view');
+Route::get('/admin/attendees/view-history/{id}', [MeetingAttendeeController::class, 'viewHistoryAttendees'])->name('admin.attendees.view-history');
+Route::get('/admin/attendees/export-excel/{id}', [MeetingAttendeeController::class, 'exportExcel'])->name('admin.attendees.export-excel');
+Route::get('/admin/attendees/export-pdf/{id}', [MeetingAttendeeController::class, 'exportPdf'])->name('admin.attendees.export-pdf');
 
     Route::get('/admin/attendees/import', [MeetingAttendeeController::class, 'showImportForm'])->name('attendees.import.form');
     Route::post('/admin/attendees/import', [MeetingAttendeeController::class, 'import'])->name('attendees.import');
