@@ -101,6 +101,16 @@
         </div>
 
         <div class="mb-3">
+            <label for="company" class="form-label">Company</label>
+            <input type="text" name="company" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="department" class="form-label">Department</label>
+            <input type="text" name="department" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
             <label for="meeting_room" class="form-label">Select Meeting Room</label>
             <select name="meeting_room_id" class="form-control" required>
                 <option value="">Choose a Room</option>

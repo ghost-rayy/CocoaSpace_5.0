@@ -12,9 +12,12 @@ class BookingHistory extends Model
     protected $table = 'booking_histories';
 
     protected $fillable = [
+        'booking_id',
         'meeting_room_id',
         'user_id',
         'requester',
+        'company',
+        'department',
         'date',
         'time',
         'duration',

@@ -19,12 +19,16 @@ class RegisterController extends Controller
     {
         $search = $request->input('search');
 
-        $bookings = Booking::where('status', 'Approved')
+        $bookings = Booking::with('meetingRoom')
+            ->whereIn('status', ['Approved', 'Not Started', 'Started'])
             ->when($search, function ($query, $search) {
-                return $query->where('requester', 'like', "%{$search}%")
-                             ->orWhere('e_ticket', 'like', "%{$search}%");
+                $query->where(function ($inner) use ($search) {
+                    $inner->where('requester', 'like', "%{$search}%")
+                        ->orWhere('e_ticket', 'like', "%{$search}%");
+                });
             })
             ->orderBy('date', 'desc')
+            ->orderBy('time', 'desc')
             ->get();
 
         return view('register.attendees.index', compact('bookings'));
@@ -55,7 +59,7 @@ class RegisterController extends Controller
             'gender' => 'required|in:Male,Female,Other',
             'email' => 'required|email',
             'department' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => 'required|digits:10',
         ]);
 
         $attendee = MeetingAttendee::create([
@@ -105,7 +109,7 @@ class RegisterController extends Controller
             'gender' => 'required|in:Male,Female,Other',
             'email' => 'required|email',
             'department' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => 'required|digits:10',
         ]);
 
         $attendee = MeetingAttendee::create([

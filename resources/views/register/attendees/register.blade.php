@@ -136,7 +136,7 @@
         position: relative;
         z-index: 1;
         text-align: center;
-        max-width: 380px;
+        max-width: none;
         width: 100%;
       }
 
@@ -211,7 +211,7 @@
 
       .form-container {
         width: 100%;
-        max-width: 460px;
+        max-width: none;
       }
 
       .form-header {
@@ -356,16 +356,17 @@
       /* Large Desktop (1440px+) */
       @media (min-width: 1440px) {
         .registration-container {
-          max-width: 1600px;
-          margin: 0 auto;
+          max-width: none;
+          width: 100%;
+          margin: 0;
         }
 
         .event-content {
-          max-width: 450px;
+          max-width: none;
         }
 
         .form-container {
-          max-width: 520px;
+          max-width: none;
         }
 
         .event-title {
@@ -1056,11 +1057,17 @@
                 <div class="form-group">
                   <label for="phone" class="form-label">Phone Number *</label>
                   <input
-                    type="number"
+                    type="tel"
                     name="phone"
                     required
+                    inputmode="numeric"
+                    minlength="10"
+                    maxlength="10"
+                    pattern="[0-9]{10}"
+                    title="Enter a 10-digit phone number"
                     placeholder="0244444444"
                     class="form-input"
+                    oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)"
                   />
                 </div>
                 <div class="form-group">
@@ -1114,11 +1121,10 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     document.getElementById('registerForm').addEventListener('submit', function(e) {
-      const now = new Date();
-      const isoString = now.toISOString();
-      document.getElementById('registration_time').value = isoString;
+      e.preventDefault();
+      const form = this;
+      document.getElementById('registration_time').value = new Date().toISOString();
 
-      // Show loading popup
       Swal.fire({
         title: 'Registering...',
         text: 'Please wait while we process your registration and send the confirmation email.',
@@ -1127,6 +1133,21 @@
           Swal.showLoading();
         }
       });
+
+      fetch('{{ route('csrf.token') }}', {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          const tokenInput = form.querySelector('input[name="_token"]');
+          if (tokenInput && data.token) {
+            tokenInput.value = data.token;
+          }
+        })
+        .finally(() => form.submit());
     });
   </script>
   <script>

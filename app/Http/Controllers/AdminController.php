@@ -201,9 +201,12 @@ class AdminController extends Controller
         } else if ($request->status === 'Declined') {
             // Move to booking_histories
             \App\Models\BookingHistory::create([
+                'booking_id' => $booking->id,
                 'meeting_room_id' => $booking->meeting_room_id,
                 'user_id' => $booking->user_id,
                 'requester' => $booking->requester,
+                'company' => $booking->company,
+                'department' => $booking->department,
                 'date' => $booking->date,
                 'time' => $booking->time,
                 'duration' => $booking->duration,
@@ -251,7 +254,11 @@ class AdminController extends Controller
     public function approve($id)
     {
         $booking = Booking::findOrFail($id);
-        $booking->update(['status' => 'Not Started']);
+        $booking->update(['status' => 'Approved']);
+        if (!$booking->e_ticket) {
+            $booking->e_ticket = $booking->generateETicket();
+            $booking->save();
+        }
         return redirect()->route('admin.bookings')->with('success', 'Booking Approved');
     }
 
@@ -260,9 +267,12 @@ class AdminController extends Controller
         $booking = Booking::findOrFail($id);
         
         BookingHistory::create([
+            'booking_id' => $booking->id,
             'meeting_room_id' => $booking->meeting_room_id,
             'user_id' => $booking->user_id,
             'requester' => $booking->requester,
+            'company' => $booking->company,
+            'department' => $booking->department,
             'date' => $booking->date,
             'time' => $booking->time,
             'duration' => $booking->duration,
@@ -358,6 +368,8 @@ class AdminController extends Controller
         $request->validate([
             'meeting_room_id' => 'required|exists:meeting_rooms,id',
             'requester' => 'required|string',
+            'company' => 'required|string|max:255',
+            'department' => 'required|string|max:255',
             'date' => 'required|date',
             'time' => 'required',
             'duration' => 'required|integer|min:1',
@@ -385,6 +397,8 @@ class AdminController extends Controller
             'meeting_room_id' => $request->meeting_room_id,
             'user_id' => Auth::id(),
             'requester' => $request->requester,
+            'company' => $request->company,
+            'department' => $request->department,
             'date' => $request->date,
             'time' => $request->time,
             'duration' => $request->duration,
@@ -425,16 +439,19 @@ class AdminController extends Controller
 
         // Copy booking data to booking_histories
         BookingHistory::create([
+            'booking_id' => $booking->id,
             'meeting_room_id' => $booking->meeting_room_id,
             'user_id' => $booking->user_id,
             'requester' => $booking->requester,
+            'company' => $booking->company,
+            'department' => $booking->department,
             'date' => $booking->date,
             'time' => $time24,
             'duration' => $booking->duration,
             'extension' => $booking->extension,
             'reason' => $booking->reason,
             'capacity' => $booking->capacity,
-            'status' => $booking->status,
+            'status' => 'Ended',
             'e_ticket' => $booking->e_ticket,
             'meeting_ended' => true,
         ]);

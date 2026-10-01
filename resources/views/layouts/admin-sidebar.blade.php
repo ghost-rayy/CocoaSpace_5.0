@@ -347,7 +347,7 @@
     </div>
 
     <div id="sidebarBookMeetingModal" class="modal" style="display:none; position:fixed; z-index:2000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); align-items:center; justify-content:center;">
-        <div class="modal-content" style="background:#fff; border-radius:12px; padding:32px; max-width:420px; margin:auto; position:relative;">
+        <div class="modal-content" style="background:#fff; border-radius:12px; padding:32px; max-width:420px; margin:auto; position:relative; max-height:85vh; overflow-y:auto;">
             <span class="close" id="closeSidebarBookModal" style="position:absolute; top:12px; right:18px; font-size:28px; cursor:pointer;">&times;</span>
             <h2 style="margin-bottom:18px;">Book a Meeting Room</h2>
             @include('admin.partials.booking_form', ['rooms' => $rooms])

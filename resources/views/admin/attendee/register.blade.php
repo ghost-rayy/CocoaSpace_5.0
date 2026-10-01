@@ -114,7 +114,7 @@
         position: relative;
         z-index: 1;
         text-align: center;
-        max-width: 380px;
+        max-width: none;
         width: 100%;
       }
 
@@ -183,7 +183,7 @@
 
       .form-container {
         width: 100%;
-        max-width: 460px;
+        max-width: none;
       }
 
       .form-header {
@@ -327,16 +327,17 @@
       /* Large Desktop (1440px+) */
       @media (min-width: 1440px) {
         .registration-container {
-          max-width: 1600px;
-          margin: 0 auto;
+          max-width: none;
+          width: 100%;
+          margin: 0;
         }
 
         .event-content {
-          max-width: 450px;
+          max-width: none;
         }
 
         .form-container {
-          max-width: 520px;
+          max-width: none;
         }
 
         .event-title {
@@ -957,11 +958,17 @@
                 <div class="form-group">
                   <label for="phone" class="form-label">Phone Number *</label>
                   <input
-                    type="number"
+                    type="tel"
                     name="phone"
                     required
+                    inputmode="numeric"
+                    minlength="10"
+                    maxlength="10"
+                    pattern="[0-9]{10}"
+                    title="Enter a 10-digit phone number"
                     placeholder="0244444444"
                     class="form-input"
+                    oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)"
                   />
                 </div>
                 <div class="form-group">
@@ -1003,16 +1010,25 @@ const registerForm = document.getElementById('registerForm');
 if (registerForm) {
   registerForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    const formData = new FormData(registerForm);
-    formData.set('registration_time', new Date().toISOString());
-    fetch(registerForm.action, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    const sendRegistration = (token) => {
+      if (token) {
+        const tokenInput = registerForm.querySelector('input[name="_token"]');
+        if (tokenInput) tokenInput.value = token;
+        const meta = document.querySelector('meta[name="csrf-token"]');
+        if (meta) meta.setAttribute('content', token);
       }
-    })
+      const formData = new FormData(registerForm);
+      formData.set('registration_time', new Date().toISOString());
+      const csrf = token || (document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '');
+      fetch(registerForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': csrf,
+          'Accept': 'application/json'
+        }
+      })
     .then(response => response.json())
     .then(data => {
       if (data.success && data.attendee) {
@@ -1042,6 +1058,17 @@ if (registerForm) {
       title: 'Error',
       text: 'Registration failed.'
     }));
+    };
+
+    fetch('{{ route('csrf.token') }}', {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => sendRegistration(data.token))
+      .catch(() => sendRegistration(null));
   });
 }
 </script>

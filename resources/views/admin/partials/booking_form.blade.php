@@ -21,6 +21,8 @@
 <form id="booking-form" action="{{ route('admin.add-store') }}" method="POST" style="display: flex; flex-direction: column; gap: 10px;">
     @csrf
     <input type="text" name="requester" class="form-control" placeholder="Person Requesting / Title" required>
+    <input type="text" name="company" class="form-control" placeholder="Company" required>
+    <input type="text" name="department" class="form-control" placeholder="Department" required>
     <select name="meeting_room_id" class="form-control" required>
         <option value="">Select Meeting Room</option>
         @foreach($rooms as $room)

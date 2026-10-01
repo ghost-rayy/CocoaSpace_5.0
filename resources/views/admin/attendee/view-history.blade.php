@@ -82,7 +82,7 @@
                                 📊 Export CSV
                             </a>
                             <a href="{{ route('admin.attendees.export-pdf', $bookingHistory->id) }}" class="btn btn-danger">
-                                📄 Export HTML
+                                📄 Export PDF
                             </a>
                         </div>
                     </div>

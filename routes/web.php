@@ -94,6 +94,10 @@ Route::get('/admin/attendees/export-pdf/{id}', [MeetingAttendeeController::class
 });
 Route::post('/register/attendees/verify', [App\Http\Controllers\MeetingAttendeeController::class, 'verify'])->name('register.attendees.verify');
 
+Route::get('/csrf-token', function () {
+    return response()->json(['token' => csrf_token()]);
+})->name('csrf.token');
+
 
 Route::middleware(['auth', 'role:register'])->group(function () {
     Route::get('/register/index', [RegisterController::class, 'index'])->name('register.index');

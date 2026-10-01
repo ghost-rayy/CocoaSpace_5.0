@@ -27,7 +27,6 @@
                         <th>Capacity</th>
                         <th>Status</th>
                         <th>E-Ticket</th>
-                        <th>Meeting Status</th>
                         <th>Attendees</th>
                     </tr>
                 </thead>
@@ -47,7 +46,7 @@
                             <td>{{ $booking->reason }}</td>
                             <td>{{ $booking->capacity }}</td>
                             <td>
-                                <span class="badge bg-{{ $booking->status == 'Approved' ? 'success' : ($booking->status == 'Declined' ? 'danger' : 'warning') }}">
+                                <span class="badge bg-{{ $booking->status == 'Declined' ? 'danger' : 'secondary' }}">
                                     {{ $booking->status }}
                                 </span>
                             </td>
@@ -59,9 +58,6 @@
                                 @endif
                             </td>
                             <td>
-                                <span class="badge bg-secondary">Ended</span>
-                            </td>
-                            <td>
                                 <a href="{{ route('admin.attendees.view-history', $booking->id) }}" 
                                    class="btn btn-sm btn-primary" 
                                    style="background-color: #42CCC5; border: none; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 12px;">
@@ -71,7 +67,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="12" style="text-align: center; color: red; font-weight: bold;">
+                            <td colspan="11" style="text-align: center; color: red; font-weight: bold;">
                                 No booking history found for your search.
                             </td>
                         </tr>

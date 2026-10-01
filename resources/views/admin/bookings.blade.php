@@ -36,6 +36,8 @@
             <thead>
                 <tr>
                     <th>Requester / Title</th>
+                    <th>Company</th>
+                    <th>Department</th>
                     <th>Duration</th>
                     <th>Date</th>
                     <th>Time</th>
@@ -45,14 +47,14 @@
                     <th>Capacity</th>
                     <th>Status</th>
                     <th>Meeting ID</th>
-                    {{-- <th>Action</th> --}}
-                    <th>Meeting Status</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($bookings as $booking)
                     <tr>
                         <td>{{ $booking->requester }}</td>
+                        <td>{{ $booking->company }}</td>
+                        <td>{{ $booking->department }}</td>
                         <td>{{ $booking->duration }}</td>
                         <td>{{ $booking->date }}</td>
                         <td>{{ $booking->time }}</td>
@@ -65,18 +67,26 @@
                         <td>{{ $booking->reason }}</td>
                         <td>{{ $booking->capacity }}</td>
                         <td>
-                            @if(in_array($booking->status, ['Approved', 'Not Started', 'Declined', 'Started']))
-                                <span style="font-size: 13px; color: #0ce462; font-weight: bold;">{{ $booking->status }}</span>
-                            @else
+                            @if($booking->status == 'Pending')
                                 <form action="{{ route('admin.bookings.updateStatus', $booking->id) }}" method="POST" class="status-form">
                                     @csrf
                                     <select name="status" class="form-select status-select" onchange="handleStatusChange(this, {{ $booking->id }})" style="background-color: white; color: rgb(0, 0, 0); border:none; cursor:hand; font-size:15px; width:100%;">
-                                        <option value="Pending" {{ $booking->status == 'Pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="Approved" {{ $booking->status == 'Approved' ? 'selected' : '' }}>Approve</option>
-                                        <option value="Declined" {{ $booking->status == 'Declined' ? 'selected' : '' }}>Decline</option>
+                                        <option value="Pending" selected>Pending</option>
+                                        <option value="Approved">Approve</option>
+                                        <option value="Declined">Decline</option>
                                     </select>
                                     <input type="hidden" name="decline_reason" class="decline-reason-input" value="{{ $booking->decline_reason ?? '' }}">
                                 </form>
+                            @elseif($booking->status == 'Started')
+                                <span style="font-size: 13px; color: #0ce462; font-weight: bold;">Started</span>
+                                <form action="{{ route('admin.bookings.endMeeting', $booking->id) }}" method="POST" style="margin-top: 6px;">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-danger" style="background-color: red; color:white; padding:4px; border: none; cursor: hand;">End Meeting</button>
+                                </form>
+                            @elseif($booking->status == 'Declined')
+                                <span style="font-size: 13px; color: #d32f2f; font-weight: bold;">Declined</span>
+                            @else
+                                <span style="font-size: 13px; color: #0ce462; font-weight: bold;">{{ $booking->status }}</span>
                             @endif
                         </td>
                         <td>
@@ -84,25 +94,6 @@
                                 <span id="ticket-{{ $booking->id }}" style="color: green; font-weight: bold;">{{ $booking->e_ticket }}</span>
                             @else
                                 N/A
-                            @endif
-                        </td>
-                        {{-- <td>
-                            <span class="badge bg-{{ $booking->status == 'Approved' ? 'success' : ($booking->status == 'Declined' ? 'danger' : 'warning') }}">
-                                {{ $booking->status }}
-                            </span>
-                        </td> --}}
-                        <td>
-                            @if($booking->status == 'Started' && !$booking->meeting_ended)
-                                <form action="{{ route('admin.bookings.endMeeting', $booking->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-danger" style="background-color: red; color:white; padding:4px; border: none; cursor: hand;">End Meeting</button>
-                                </form>
-                            @elseif($booking->meeting_ended)
-                                <span class="badge bg-secondary">Ended</span>
-                            @elseif($booking->status == 'Approved' || $booking->status == 'Not Started')
-                                <span style="font-size: 13px; color: #0ce462; font-weight: bold;">Not Started</span>
-                            @else
-                                <span class="badge bg-{{ $booking->status == 'Declined' ? 'danger' : 'warning' }}">{{ $booking->status }}</span>
                             @endif
                         </td>
 

@@ -14,6 +14,7 @@ use App\Models\MeetingAttendee as Attendee;
 use Illuminate\Support\Facades\Validator;
 use App\Models\BookingDocument;
 use App\Mail\VerificationConfirmation;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MeetingAttendeeController extends Controller
 {
@@ -223,8 +224,8 @@ class MeetingAttendeeController extends Controller
     public function viewHistoryAttendees(Request $request, $id)
     {
         $bookingHistory = \App\Models\BookingHistory::with('meetingRoom')->findOrFail($id);
-        
-        $attendees = \App\Models\MeetingAttendee::where('booking_id', $bookingHistory->booking_id)
+
+        $attendees = $this->attendeesForHistory($bookingHistory)
             ->when($request->search, function ($query) use ($request) {
                 $query->where(function ($q) use ($request) {
                     $q->where('name', 'like', '%'.$request->search.'%')
@@ -241,7 +242,7 @@ class MeetingAttendeeController extends Controller
     public function exportExcel($id)
     {
         $bookingHistory = \App\Models\BookingHistory::with('meetingRoom')->findOrFail($id);
-        $attendees = \App\Models\MeetingAttendee::where('booking_id', $bookingHistory->booking_id)->get();
+        $attendees = $this->attendeesForHistory($bookingHistory)->get();
 
         $filename = 'attendees_' . $bookingHistory->requester . '_' . $bookingHistory->date . '.csv';
 
@@ -278,15 +279,19 @@ class MeetingAttendeeController extends Controller
     public function exportPdf($id)
     {
         $bookingHistory = \App\Models\BookingHistory::with('meetingRoom')->findOrFail($id);
-        $attendees = \App\Models\MeetingAttendee::where('booking_id', $bookingHistory->booking_id)->get();
+        $attendees = $this->attendeesForHistory($bookingHistory)->get();
 
-        $filename = 'attendees_' . $bookingHistory->requester . '_' . $bookingHistory->date . '.html';
-        
-        $html = view('admin.attendee.export-pdf', compact('attendees', 'bookingHistory'))->render();
-        
-        return response($html)
-            ->header('Content-Type', 'text/html')
-            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        $safeTitle = preg_replace('/[^A-Za-z0-9_-]+/', '_', $bookingHistory->requester);
+        $filename = 'attendees_' . $safeTitle . '_' . $bookingHistory->date . '.pdf';
+
+        return Pdf::loadView('admin.attendee.export-pdf', compact('attendees', 'bookingHistory'))
+            ->setPaper('a4', 'landscape')
+            ->download($filename);
+    }
+
+    private function attendeesForHistory($bookingHistory)
+    {
+        return \App\Models\MeetingAttendee::where('booking_id', $bookingHistory->booking_id ?? 0);
     }
 
     public function deleteDocument($id)
@@ -382,7 +387,7 @@ class MeetingAttendeeController extends Controller
             'gender' => 'required|in:Male,Female,Other',
             'email' => 'required|email',
             'department' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => 'required|digits:10',
         ]);
 
         $meeting_code = strtoupper(Str::random(6));
