@@ -1,1076 +1,903 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>CocoaSpace</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        font-family: "Poppins", sans-serif;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: 24px;
-        color: rgb(15, 23, 42);
-        background: linear-gradient(
-          135deg,
-          #f0fdfc 0%,
-          #ccfbf1 25%,
-          #99f6e4 50%,
-          #5eead4 75%,
-          #2dd4bf 100%
-        );
-        height: 100vh;
-        overflow: hidden;
-      }
-
-      .navigation {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 1000;
-        display: flex;
-        gap: 8px;
-      }
-
-      .nav-link {
-        display: inline-block;
-        padding: 8px 16px;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 8px;
-        text-decoration: none;
-        color: #42ccc5;
-        font-weight: 600;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(66, 204, 197, 0.3);
-        font-size: 14px;
-        transition: all 0.2s ease;
-      }
-
-      .nav-link:hover {
-        background: rgb(15, 104, 99);
-        transform: translateY(-1px);
-        color: #fff;
-      }
-
-      .registration-container {
-        display: flex;
-        height: 100vh;
-        overflow: hidden;
-      }
-
-      /* Event Section */
-      .event-section {
-        flex: 1;
-        background: linear-gradient(
-          135deg,
-          #42ccc5 0%,
-          #2dd4bf 25%,
-          #14b8a6 50%,
-          #0f766e 75%,
-          #134e4a 100%
-        );
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 1.5rem;
-        color: white;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .event-section::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background:
-          radial-gradient(
-            circle at 20% 20%,
-            rgba(255, 255, 255, 0.1) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 80% 80%,
-            rgba(255, 255, 255, 0.1) 0%,
-            transparent 50%
-          );
-        opacity: 0.6;
-      }
-
-      .event-content {
-        position: relative;
-        z-index: 1;
-        text-align: center;
-        max-width: none;
-        width: 100%;
-      }
-
-      .event-title {
-        font-size: 2.2rem;
-        font-weight: none;
-        margin-bottom: 3rem;
-        letter-spacing: -0.025em;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        line-height: 30px;
-      }
-
-      .event-image-container {
-        margin: 1rem 0;
-        display: flex;
-        justify-content: center;
-      }
-
-      .event-image {
-        border-radius: 12px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        width: 250px;
-        height: 300px;
-        margin-bottom: 70px;
-      }
-
-      .event-details {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        border-radius: 16px;
-        padding: 1.2rem;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        margin: 1rem 0 2rem;
-      }
-
-      .detail-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
-        font-weight: 500;
-      }
-
-      .detail-item:last-child {
-        margin-bottom: 0;
-      }
-
-      .detail-icon {
-        width: 20px;
-        height: 20px;
-        margin-right: 12px;
-        opacity: 0.9;
-      }
-
-      /* Form Section */
-      .form-section {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 1.5rem;
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(10px);
-        overflow-y: auto;
-      }
-
-      .form-container {
-        width: 100%;
-        max-width: none;
-      }
-
-      .form-header {
-        text-align: center;
-        margin-bottom: 1.5rem;
-      }
-
-      .form-title {
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin-bottom: 0.3rem;
-        background: linear-gradient(135deg, #42ccc5 0%, #0f766e 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        padding: 20px;
-      }
-
-      .form-subtitle {
-        color: rgb(71, 85, 105);
-        font-size: 1rem;
-        font-weight: 500;
-      }
-
-      .form-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow:
-          0 20px 40px rgba(66, 204, 197, 0.15),
-          0 8px 20px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(66, 204, 197, 0.2);
-      }
-
-      .success-message {
-        background: linear-gradient(135deg, #42ccc5 0%, #14b8a6 100%);
-        color: white;
-        padding: 1rem;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-        text-align: center;
-        font-weight: 600;
-        font-size: 0.9rem;
-        display: none;
-      }
-
-      .registration-form {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .form-row {
-        display: flex;
-        gap: 1rem;
-      }
-
-      .form-group {
-        flex: 1;
-      }
-
-      .form-label {
-        display: block;
-        color: rgb(30, 41, 59);
-        font-size: 0.875rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-      }
-
-      .form-input {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border: 2px solid rgba(203, 213, 225, 0.8);
-        border-radius: 10px;
-        font-size: 0.9rem;
-        font-family: inherit;
-        font-weight: 500;
-        outline: none;
-        transition: all 0.2s ease;
-        background: rgba(255, 255, 255, 0.9);
-      }
-
-      .form-input:focus {
-        border-color: #42ccc5;
-        box-shadow: 0 0 0 3px rgba(66, 204, 197, 0.1);
-        transform: translateY(-1px);
-        background: white;
-      }
-
-      .form-input::placeholder {
-        color: rgb(156, 163, 175);
-        font-weight: 400;
-      }
-
-      .submit-button {
-        width: 100%;
-        background: linear-gradient(135deg, #42ccc5 0%, #14b8a6 100%);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 1rem 2rem;
-        font-size: 1rem;
-        font-weight: 700;
-        font-family: inherit;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 0.5rem;
-      }
-
-      .submit-button:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(66, 204, 197, 0.4);
-      }
-
-      .submit-button:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-        transform: none;
-      }
-
-      .loading-spinner {
-        width: 20px;
-        height: 20px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: white;
-        animation: spin 1s linear infinite;
-        margin-right: 8px;
-      }
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      /* Large Desktop (1440px+) */
-      @media (min-width: 1440px) {
-        .registration-container {
-          max-width: none;
-          width: 100%;
-          margin: 0;
-        }
-
-        .event-content {
-          max-width: none;
-        }
-
-        .form-container {
-          max-width: none;
-        }
-
-        .event-title {
-          font-size: 2.5rem;
-        }
-
-        .form-title {
-          font-size: 2rem;
-        }
-      }
-
-      /* Standard Desktop (1200px - 1439px) */
-      @media (max-width: 1439px) and (min-width: 1200px) {
-        .event-section {
-          padding: 2rem;
-        }
-
-        .form-section {
-          padding: 2rem;
-        }
-      }
-
-      /* Small Desktop / Large Tablet (1024px - 1199px) */
-      @media (max-width: 1199px) and (min-width: 1024px) {
-        .registration-container {
-          height: auto;
-          min-height: 100vh;
-        }
-
-        .event-section {
-          padding: 1.5rem;
-        }
-
-        .form-section {
-          padding: 1.5rem;
-          overflow-y: auto;
-        }
-
-        .event-title {
-          font-size: 2rem;
-        }
-
-        .form-title {
-          font-size: 1.7rem;
-        }
-
-        .event-details {
-          margin: 1rem 0 1.5rem;
-        }
-      }
-
-      /* Tablet Landscape (768px - 1023px) - Keep desktop-style layout */
-      @media (max-width: 1023px) and (min-width: 768px) and (orientation: landscape) {
-        .registration-container {
-          flex-direction: row;
-          height: 100vh;
-          overflow: hidden;
-        }
-
-        .event-section {
-          flex: 1;
-          padding: 1.2rem;
-        }
-
-        .form-section {
-          flex: 1;
-          padding: 1.2rem;
-          overflow-y: auto;
-        }
-
-        .event-title {
-          font-size: 1.8rem;
-          margin-bottom: 0.3rem;
-        }
-
-        .event-subtitle {
-          font-size: 0.95rem;
-          margin-bottom: 1rem;
-        }
-
-        .form-title {
-          font-size: 1.5rem;
-        }
-
-        .form-card {
-          padding: 1.5rem;
-        }
-
-        .event-image {
-          width: 160px;
-        }
-
-        .event-details {
-          padding: 1.2rem;
-          margin: 1rem 0 1rem;
-        }
-
-        .detail-item {
-          font-size: 0.8rem;
-          margin-bottom: 0.8rem;
-        }
-
-        .detail-icon {
-          width: 18px;
-          height: 18px;
-          margin-right: 10px;
-        }
-
-        .registration-form {
-          gap: 0.9rem;
-        }
-
-        .form-input {
-          padding: 0.7rem 0.9rem;
-          font-size: 0.85rem;
-        }
-      }
-
-      /* Tablet Portrait (768px - 1023px) - Stack layout */
-      @media (max-width: 1023px) and (min-width: 768px) and (orientation: portrait) {
-        .registration-container {
-          flex-direction: column;
-          height: auto;
-          overflow: visible;
-        }
-
-        .event-section {
-          min-height: 45vh;
-          padding: 1.5rem;
-        }
-
-        .form-section {
-          padding: 1.5rem;
-          overflow-y: visible;
-        }
-
-        .event-title {
-          font-size: 1.9rem;
-          margin-bottom: 0.4rem;
-        }
-
-        .event-subtitle {
-          font-size: 1rem;
-          margin-bottom: 1.2rem;
-        }
-
-        .form-title {
-          font-size: 1.6rem;
-        }
-
-        .form-card {
-          padding: 1.75rem;
-        }
-
-        .event-image {
-          width: 180px;
-        }
-
-        .event-details {
-          padding: 1.3rem;
-          margin: 1.2rem 0 1rem;
-        }
-
-        .detail-item {
-          font-size: 0.85rem;
-          margin-bottom: 0.9rem;
-        }
-      }
-
-      /* General Tablet (768px - 1023px) - Fallback for devices that don't support orientation queries */
-      @media (max-width: 1023px) and (min-width: 768px) {
-        .event-content {
-          max-width: 350px;
-        }
-
-        .form-container {
-          max-width: 420px;
-        }
-
-        .detail-icon {
-          width: 18px;
-          height: 18px;
-          margin-right: 10px;
-        }
-      }
-
-      /* Mobile Landscape / Small Tablet (641px - 767px) */
-      @media (max-width: 767px) and (min-width: 641px) {
-        .registration-container {
-          flex-direction: column;
-          height: auto;
-          overflow: visible;
-        }
-
-        .event-section {
-          min-height: 42vh;
-          padding: 1.25rem;
-        }
-
-        .form-section {
-          padding: 1.25rem;
-        }
-
-        .event-title {
-          font-size: 1.7rem;
-          margin-bottom: 0.3rem;
-        }
-
-        .event-subtitle {
-          font-size: 0.95rem;
-          margin-bottom: 1rem;
-        }
-
-        .form-title {
-          font-size: 1.5rem;
-        }
-
-        .form-card {
-          padding: 1.5rem;
-        }
-
-        .form-row {
-          flex-direction: column;
-          gap: 1rem;
-        }
-
-        .event-image {
-          width: 160px;
-        }
-
-        .event-details {
-          padding: 1.2rem;
-          margin: 1rem 0 0.8rem;
-        }
-
-        .detail-item {
-          font-size: 0.8rem;
-          margin-bottom: 0.8rem;
-        }
-
-        .detail-icon {
-          width: 18px;
-          height: 18px;
-          margin-right: 10px;
-        }
-      }
-
-      /* Mobile Portrait (481px - 640px) */
-      @media (max-width: 640px) and (min-width: 481px) {
-        .registration-container {
-          flex-direction: column;
-          height: auto;
-          overflow: visible;
-        }
-
-        .event-section {
-          min-height: 38vh;
-          padding: 1rem;
-        }
-
-        .form-section {
-          padding: 1rem;
-        }
-
-        .event-title {
-          font-size: 1.6rem;
-          margin-bottom: 0.25rem;
-        }
-
-        .event-subtitle {
-          font-size: 0.9rem;
-          margin-bottom: 0.9rem;
-        }
-
-        .form-title {
-          font-size: 1.4rem;
-        }
-
-        .form-card {
-          padding: 1.25rem;
-        }
-
-        .form-row {
-          flex-direction: column;
-          gap: 1rem;
-        }
-
-        .registration-form {
-          gap: 0.9rem;
-        }
-
-        .event-image {
-          width: 140px;
-        }
-
-        .event-details {
-          padding: 1rem;
-          margin: 0.9rem 0 0.6rem;
-        }
-
-        .detail-item {
-          font-size: 0.75rem;
-          margin-bottom: 0.7rem;
-        }
-
-        .detail-icon {
-          width: 16px;
-          height: 16px;
-          margin-right: 8px;
-        }
-
-        .form-input {
-          padding: 0.7rem 0.9rem;
-          font-size: 0.85rem;
-        }
-
-        .submit-button {
-          padding: 0.9rem 1.5rem;
-          font-size: 0.95rem;
-        }
-      }
-
-      /* Small Mobile (320px - 480px) */
-      @media (max-width: 480px) {
-        .registration-container {
-          flex-direction: column;
-          height: auto;
-          overflow: visible;
-        }
-
-        .event-section {
-          min-height: 35vh;
-          padding: 0.75rem;
-        }
-
-        .form-section {
-          padding: 0.75rem;
-        }
-
-        .event-title {
-          font-size: 1.4rem;
-          margin-bottom: 0.2rem;
-        }
-
-        .event-subtitle {
-          font-size: 0.85rem;
-          margin-bottom: 0.8rem;
-        }
-
-        .form-header {
-          margin-bottom: 1.2rem;
-        }
-
-        .form-title {
-          font-size: 1.25rem;
-          margin-bottom: 0.2rem;
-        }
-
-        .form-subtitle {
-          font-size: 0.9rem;
-        }
-
-        .form-card {
-          padding: 1rem;
-          border-radius: 12px;
-        }
-
-        .form-row {
-          flex-direction: column;
-          gap: 0.9rem;
-        }
-
-        .registration-form {
-          gap: 0.8rem;
-        }
-
-        .event-image {
-          width: 120px;
-        }
-
-        .event-details {
-          padding: 0.9rem;
-          margin: 0.8rem 0 0.5rem;
-          border-radius: 12px;
-        }
-
-        .detail-item {
-          font-size: 0.7rem;
-          margin-bottom: 0.6rem;
-        }
-
-        .detail-icon {
-          width: 14px;
-          height: 14px;
-          margin-right: 6px;
-        }
-
-        .form-label {
-          font-size: 0.8rem;
-          margin-bottom: 0.4rem;
-        }
-
-        .form-input {
-          padding: 0.6rem 0.8rem;
-          font-size: 0.8rem;
-          border-radius: 8px;
-        }
-
-        .submit-button {
-          padding: 0.8rem 1.2rem;
-          font-size: 0.9rem;
-          border-radius: 10px;
-        }
-      }
-
-      /* Extra Small Mobile (max-width: 319px) */
-      @media (max-width: 319px) {
-        .event-section {
-          padding: 0.5rem;
-          min-height: 32vh;
-        }
-
-        .form-section {
-          padding: 0.5rem;
-        }
-
-        .event-title {
-          font-size: 1.2rem;
-        }
-
-        .event-subtitle {
-          font-size: 0.8rem;
-        }
-
-        .form-title {
-          font-size: 1.1rem;
-        }
-
-        .form-card {
-          padding: 0.8rem;
-        }
-
-        .event-image {
-          width: 100px;
-        }
-
-        .event-details {
-          padding: 0.7rem;
-        }
-
-        .detail-item {
-          font-size: 0.65rem;
-        }
-
-        .form-input {
-          padding: 0.5rem 0.7rem;
-          font-size: 0.75rem;
-        }
-
-        .submit-button {
-          padding: 0.7rem 1rem;
-          font-size: 0.85rem;
-        }
-      }
-
-      @media (max-width: 600px) {
-        html, body {
-          height: auto !important;
-          min-height: 100vh !important;
-          overflow-x: hidden !important;
-          overflow-y: auto !important;
-          position: static !important;
-        }
-        .registration-container {
-          flex-direction: column !important;
-          width: 100vw !important;
-          max-width: 100vw !important;
-          min-width: 0 !important;
-          height: auto !important;
-          min-height: 100vh !important;
-          overflow: visible !important;
-          position: static !important;
-          display: block !important;
-        }
-        .event-section, .form-section {
-          width: 100vw !important;
-          max-width: 100vw !important;
-          min-width: 0 !important;
-          height: auto !important;
-          min-height: 0 !important;
-          overflow: visible !important;
-          position: static !important;
-          display: block !important;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <nav class="navigation">
-      <a href="{{ route('admin.registration') }}" class="nav-link">← Home</a>
-    </nav>
-
-    <div class="registration-container">
-      <!-- Event Details Section -->
-      <div class="event-section">
-        <div class="event-content">
-          <h1 class="event-title">{{ $bookings->requester }}</h1>
-          <div class="event-image-container">
-            @if($bookings->flyer_path)
-                <img src="{{ asset($bookings->flyer_path) }}" alt="Event logo" class="event-image" loading="lazy">
-            @else
-                <img src="{{ asset('images/meet.png') }}" alt="Meeting Illustration" class="event-image" loading="lazy">
-            @endif
-          </div>
-
-          <div class="event-details">
-            <div class="detail-item">
-              <svg class="detail-icon" fill="currentColor" viewBox="0 0 24 24">
-                <path
-                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
-                />
-              </svg>
-              <span>{{ $bookings->meetingRoom->name}}</span>
+@extends('layouts.admin-sidebar')
+@section('content')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+
+@php
+    $defaultEmailSubject = 'Meeting Registration Confirmation';
+    $defaultEmailBody = '<p>Hello <b>[Name]</b>,</p><p>Your registration was successful!</p><p><b>Your Meeting Code:</b> <span style="color:#42CCC5;">[Meeting Code]</span><br>Please keep this code safe. You will need it to verify your attendance at the meeting.</p><p>Best regards,<br><b>CocoaSpace Team</b></p>';
+    $savedAttachments = $bookings->email_attachment_paths ?? [];
+@endphp
+
+<div class="modern-container">
+    <div class="modern-info-bar">
+        <div>
+            <h1>Register Attendees</h1>
+            <div class="modern-meeting-details">
+                <span><strong>Requester / Title:</strong> {{ $bookings->requester }}</span>
+                <span><strong>Date:</strong> {{ $bookings->date }}</span>
+                <span><strong>Time:</strong> {{ $bookings->time }}</span>
+                <span><strong>Room:</strong> {{ $bookings->meetingRoom->name ?? 'N/A' }}</span>
             </div>
-              <div class="detail-item">
-                <svg class="detail-icon" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 19V5c0-1.1-.9-2-2-2H7c-1.1 0-2 .9-2 2v14h2v-7h2v7h10zM15 11h-2V9h2v2z"/>
-                </svg>
-              <span>Room {{ $bookings->meetingRoom->room_number }}</span>
-            </div>
-            <div class="detail-item">
-              <svg class="detail-icon" fill="currentColor" viewBox="0 0 24 24">
-                <path
-                  d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
-                />
-              </svg>
-              <span>{{ $bookings->date }}</span>
-            </div>
-            <div class="detail-item">
-              <svg class="detail-icon" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2zm1 11h-4V7h2v4h2z"/>
-              </svg>
-              <span>{{ $bookings->time }}</span>
-            </div>
-          </div>
         </div>
-      </div>
+    </div>
 
-      <!-- Registration Form Section -->
-      <div class="form-section">
-        <div class="form-container">
-          <div class="form-header">
+    <div class="page-tabs">
+        <button type="button" class="page-tab active" data-tab="attendees">Attendees</button>
+        <button type="button" class="page-tab" data-tab="mail-template">Mail Template</button>
+    </div>
+
+    {{-- Attendees Tab --}}
+    <div class="tab-panel active" id="tab-attendees">
+        <div class="modern-actions">
+            <form action="{{ route('admin.attendees.register', $bookings->id) }}" method="GET" class="modern-search-form">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name, email or phone" class="modern-search-input">
+                <button type="submit" class="modern-search-btn">🔍 Search</button>
+                @if(request('search'))
+                <a href="{{ route('admin.attendees.register', $bookings->id) }}" class="modern-clear-btn">Clear</a>
+                @endif
+            </form>
+            <button type="button" id="openRegisterModal" class="modern-register-btn">+ Register Attendee</button>
+        </div>
+
+        @if($attendees->count())
+        <div class="modern-table-wrapper">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Gender</th>
+                        <th>Email</th>
+                        <th>Department / Company</th>
+                        <th>Phone</th>
+                        <th>Registration Time</th>
+                        <th>Status</th>
+                        <th>Verification Code</th>
+                        <th>Mail Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($attendees as $attendee)
+                        <tr class="modern-card-row" data-attendee-id="{{ $attendee->id }}">
+                            <td>{{ $attendee->name ?? 'N/A'}}</td>
+                            <td>{{ $attendee->gender ?? 'N/A'}}</td>
+                            <td>{{ $attendee->email ?? 'N/A'}}</td>
+                            <td>{{ $attendee->department ?? 'N/A'}}</td>
+                            <td>{{ $attendee->phone ?? 'N/A'}}</td>
+                            <td>{{ $attendee->created_at->format('Y-m-d H:i:s') }}</td>
+                            <td>
+                                @if($attendee->status === 'present')
+                                    <span class="modern-badge badge-present">Present</span>
+                                @else
+                                    <span class="modern-badge badge-notpresent">Not Present</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($attendee->status === 'present')
+                                    <span class="modern-code code-present">{{ $attendee->meeting_code }}</span>
+                                @else
+                                    <span class="modern-code code-notpresent">{{ $attendee->meeting_code }}</span>
+                                @endif
+                            </td>
+                            <td class="mail-status-cell">
+                                @if(($attendee->email_status ?? null) === 'sent')
+                                    <span class="modern-badge badge-mail-sent">Sent</span>
+                                @else
+                                    <div class="mail-failed-wrap">
+                                        <span class="modern-badge badge-mail-failed">{{ ($attendee->email_status ?? null) === 'failed' ? 'Failed' : 'Not Sent' }}</span>
+                                        <button type="button" class="resend-mail-btn" data-attendee-id="{{ $attendee->id }}">Resend</button>
+                                    </div>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top: 16px;">
+            {{ $attendees->withQueryString()->links() }}
+        </div>
+        @else
+            <p class="modern-empty"><strong>No attendees have been registered for this meeting yet.</strong></p>
+        @endif
+    </div>
+
+    {{-- Mail Template Tab --}}
+    <div class="tab-panel" id="tab-mail-template">
+        <p class="template-hint">
+            Set the email that will be sent automatically when an attendee registers.
+            Use <code>[Name]</code> and <code>[Meeting Code]</code> as placeholders.
+        </p>
+
+        <form id="mailTemplateForm" enctype="multipart/form-data" class="mail-template-form">
+            @csrf
+            <div class="form-group">
+                <label for="email_subject" class="form-label">Subject *</label>
+                <input
+                    type="text"
+                    name="email_subject"
+                    id="email_subject"
+                    class="form-input"
+                    required
+                    value="{{ $bookings->email_subject ?: $defaultEmailSubject }}"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email_body" class="form-label">Message *</label>
+                <textarea name="email_body" id="email_body" class="form-input email-body-editor" rows="14">{{ $bookings->email_body ?: $defaultEmailBody }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="attachments" class="form-label">Attachments (optional)</label>
+                <input type="file" name="attachments[]" id="attachments" class="form-input" multiple>
+                <label class="clear-attachments-label">
+                    <input type="checkbox" name="clear_attachments" id="clear_attachments" value="1">
+                    Clear existing saved attachments
+                </label>
+            </div>
+
+            @if(count($savedAttachments))
+            <div class="saved-attachments">
+                <strong>Current attachments:</strong>
+                <ul>
+                    @foreach($savedAttachments as $path)
+                        <li>
+                            <a href="{{ asset('storage/' . $path) }}" target="_blank">{{ basename($path) }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+
+            <button type="submit" class="submit-button" id="saveTemplateBtn">Save Mail Template</button>
+        </form>
+    </div>
+</div>
+
+<!-- Registration Modal -->
+<div id="registerModal" class="register-modal">
+    <div class="register-modal-content">
+        <span class="register-modal-close" id="closeRegisterModal">&times;</span>
+        <div class="form-header">
             <h2 class="form-title">Registration Form</h2>
             <p class="form-subtitle">Join us for an unforgettable experience</p>
-          </div>
-
-          @if(session('success'))
-                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                <script>
-                    Swal.fire({
-                        icon: 'success',
-                        title: '{{ session('success') }}',
-                        showConfirmButton: false,
-                        timer: 3000
-                    });
-                </script>
-            @endif
-
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            {{-- <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                document.querySelectorAll('form').forEach(function(form) {
-                    form.addEventListener('submit', function(e) {
-                        Swal.fire({
-                            title: 'Processing...',
-                            text: 'Please wait while we process your request.',
-                            allowOutsideClick: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-                    });
-                });
-            });
-            </script> --}}
-
-            <form class="registration-form" action="/admin/attendees/register-ajax" method="POST" id="registerForm">
+        </div>
+        <form class="registration-form" action="/admin/attendees/register-ajax" method="POST" id="registerForm">
             @csrf
-                <input type="hidden" name="booking_id" value="{{ $bookings->id }}">
-                <input type="hidden" name="registration_time" id="registration_time" value="">
+            <input type="hidden" name="booking_id" value="{{ $bookings->id }}">
+            <input type="hidden" name="registration_time" id="registration_time" value="">
 
-                <div class="form-row">
+            <div class="form-group">
+                <label for="name" class="form-label">First Name *</label>
+                <input type="text" name="name" id="name" required placeholder="Enter full name" class="form-input" style="text-transform: uppercase;" />
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address *</label>
+                <input type="email" name="email" id="email" required placeholder="Enter email address" class="form-input" />
+            </div>
+
+            <div class="form-row">
                 <div class="form-group">
-                  <label for="firstName" class="form-label">First Name *</label>
-                  <input
+                    <label for="phone" class="form-label">Phone Number *</label>
+                    <input
+                        type="tel"
+                        name="phone"
+                        id="phone"
+                        required
+                        inputmode="numeric"
+                        minlength="10"
+                        maxlength="10"
+                        pattern="[0-9]{10}"
+                        title="Enter a 10-digit phone number"
+                        placeholder="0244444444"
+                        class="form-input"
+                        oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="gender" class="form-label">Gender *</label>
+                    <select name="gender" id="gender" class="form-input" required style="text-transform: uppercase;">
+                        <option value="" disabled selected>Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="department" class="form-label">Company/Organization/Department *</label>
+                <input
                     type="text"
-                    name="name"
+                    name="department"
+                    id="department"
                     required
-                    placeholder="Enter full name"
+                    placeholder="Enter company, organization or department"
                     class="form-input"
                     style="text-transform: uppercase;"
-                  />
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="email" class="form-label">Email Address *</label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="Enter email address"
-                  class="form-input"
+                    value="{{ strtoupper(trim(collect([$bookings->company, $bookings->department])->filter()->implode(' / '))) }}"
                 />
-              </div>
+            </div>
 
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="phone" class="form-label">Phone Number *</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    required
-                    inputmode="numeric"
-                    minlength="10"
-                    maxlength="10"
-                    pattern="[0-9]{10}"
-                    title="Enter a 10-digit phone number"
-                    placeholder="0244444444"
-                    class="form-input"
-                    oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)"
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="gender" class="form-label">Gender *</label>
-                  <select  name="gender" class="form-input" required style="text-transform: uppercase;">
-                    <option value="" disabled selected>Select gender</option>
-                    <option value="Male" @if(old('gender') == 'Male') selected @endif>Male</option>
-                    <option value="Female" @if(old('gender') == 'Female') selected @endif>Female</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="department" class="form-label"
-                  >Company/Organization/Department *</label
-                >
-                <input
-                  type="text"
-                  name="department"
-                  required
-                  placeholder="Enter company, organization or department"
-                  class="form-input"
-                  style="text-transform: uppercase;"
-                />
-              </div>
-
-              <button type="submit" class="submit-button">
-                Register Now
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
+            <button type="submit" class="submit-button">Register Now</button>
+        </form>
     </div>
-    @include('admin.partials.compose_email_modal')
-    <script>
-// Clean AJAX-only registration handler for #registerForm
-const registerForm = document.getElementById('registerForm');
-if (registerForm) {
-  registerForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const sendRegistration = (token) => {
-      if (token) {
-        const tokenInput = registerForm.querySelector('input[name="_token"]');
-        if (tokenInput) tokenInput.value = token;
-        const meta = document.querySelector('meta[name="csrf-token"]');
-        if (meta) meta.setAttribute('content', token);
-      }
-      const formData = new FormData(registerForm);
-      formData.set('registration_time', new Date().toISOString());
-      const csrf = token || (document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '');
-      fetch(registerForm.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': csrf,
-          'Accept': 'application/json'
-        }
-      })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success && data.attendee) {
-        showComposeEmailModal(data.attendee.email);
-        setTimeout(function() {
-          var recipientsInput = document.getElementById('recipients');
-          if (recipientsInput && !recipientsInput.value) {
-            recipientsInput.value = data.attendee.email;
-          }
-        }, 100);
-        if (window.CKEDITOR && CKEDITOR.instances.body) {
-          let body = CKEDITOR.instances.body.getData();
-          body = body.replace(/\[Name\]/g, data.attendee.name);
-          body = body.replace(/\[Meeting Code\]/g, data.attendee.meeting_code);
-          CKEDITOR.instances.body.setData(body);
-        }
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: data.message || 'Registration failed.'
-        });
-      }
-    })
-    .catch(() => Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'Registration failed.'
-    }));
-    };
+</div>
 
-    fetch('{{ route('csrf.token') }}', {
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Accept': 'application/json'
-      }
-    })
-      .then(response => response.json())
-      .then(data => sendRegistration(data.token))
-      .catch(() => sendRegistration(null));
-  });
+<style>
+.modern-container {
+    max-width: 1300px;
+    margin: 40px auto 0 auto;
+    padding: 32px 24px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(34, 197, 194, 0.08), 0 1.5px 4px rgba(0,0,0,0.04);
 }
+.modern-info-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 20px;
+}
+.modern-info-bar h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f766e;
+    margin: 0 0 8px 0;
+    letter-spacing: 1px;
+    text-align: left;
+}
+.modern-meeting-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    font-size: 1.08rem;
+    color: #444;
+    font-weight: 500;
+}
+.page-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 24px;
+}
+.page-tab {
+    padding: 12px 22px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+}
+.page-tab.active {
+    color: #0f766e;
+    border-bottom-color: #42CCC5;
+}
+.page-tab:hover {
+    color: #0f766e;
+}
+.tab-panel {
+    display: none;
+}
+.tab-panel.active {
+    display: block;
+}
+.modern-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+.modern-search-form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.modern-search-input {
+    padding: 10px 14px;
+    border: 1.5px solid #42CCC5;
+    border-radius: 7px;
+    font-size: 1rem;
+    outline: none;
+    background: #fff;
+}
+.modern-search-input:focus {
+    border: 1.5px solid #0f766e;
+}
+.modern-search-btn {
+    padding: 10px 18px;
+    background: linear-gradient(90deg, #42CCC5 60%, #0f766e 100%);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.modern-clear-btn {
+    padding: 10px 18px;
+    background: #fff;
+    color: #0f766e;
+    border-radius: 7px;
+    font-weight: 600;
+    text-decoration: underline;
+    border: 1.5px solid #42CCC5;
+}
+.modern-register-btn {
+    padding: 10px 20px;
+    background: #0f766e;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.modern-register-btn:hover {
+    background: #42CCC5;
+}
+.modern-table-wrapper {
+    margin-top: 18px;
+    overflow-x: auto;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(34, 197, 194, 0.06);
+    background: #f9f9fb;
+}
+.modern-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+.modern-table thead th {
+    background: #42CCC5;
+    color: #fff;
+    font-weight: 600;
+    padding: 14px 10px;
+    border-radius: 8px 8px 0 0;
+    font-size: 1rem;
+    text-align: left;
+}
+.modern-table tbody tr.modern-card-row {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(34, 197, 194, 0.07);
+    border-radius: 8px;
+}
+.modern-table td {
+    padding: 14px 10px;
+    font-size: 1rem;
+    color: #222;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+.modern-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+.badge-present {
+    background: linear-gradient(90deg, #42CCC5 60%, #0f766e 100%);
+    color: #fff;
+}
+.badge-notpresent {
+    background: #e5e7eb;
+    color: #222;
+}
+.badge-mail-sent {
+    background: #d1fae5;
+    color: #059669;
+}
+.badge-mail-failed {
+    background: #fee2e2;
+    color: #dc2626;
+}
+.mail-failed-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+.resend-mail-btn {
+    padding: 6px 12px;
+    background: #0f766e;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.resend-mail-btn:hover {
+    background: #42CCC5;
+}
+.resend-mail-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+.modern-code {
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: inline-block;
+}
+.code-present {
+    background: #d1fae5;
+    color: #059669;
+}
+.code-notpresent {
+    background: #fee2e2;
+    color: #dc2626;
+}
+.modern-empty {
+    text-align: center;
+    color: #ef4444;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 32px 0;
+}
+.template-hint {
+    background: #f0fdfa;
+    border: 1px solid #99f6e4;
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: #0f766e;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+.template-hint code {
+    background: #ccfbf1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+}
+.mail-template-form {
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.email-body-editor {
+    min-height: 320px;
+}
+.cke_chrome {
+    border: 1.5px solid #42CCC5 !important;
+    border-radius: 10px !important;
+    overflow: hidden;
+}
+.cke_top {
+    background: #f0fdfa !important;
+    border-bottom: 1px solid #99f6e4 !important;
+}
+.clear-attachments-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+.saved-attachments {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+.saved-attachments ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
+}
+.saved-attachments a {
+    color: #0f766e;
+    font-weight: 600;
+}
+
+/* Modal */
+.register-modal {
+    display: none;
+    position: fixed;
+    z-index: 3000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.swal2-container {
+    z-index: 20000 !important;
+}
+.register-modal-content {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(66, 204, 197, 0.2);
+    border: 1px solid rgba(66, 204, 197, 0.25);
+}
+.register-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 28px;
+    color: #888;
+    cursor: pointer;
+    line-height: 1;
+}
+.register-modal-close:hover {
+    color: #0f766e;
+}
+.form-header {
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+.form-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    background: linear-gradient(135deg, #42ccc5 0%, #0f766e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.form-subtitle {
+    color: rgb(71, 85, 105);
+    font-size: 0.95rem;
+}
+.registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+.form-group {
+    flex: 1;
+}
+.form-label {
+    display: block;
+    color: rgb(30, 41, 59);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid rgba(203, 213, 225, 0.8);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+    background: #fff;
+    box-sizing: border-box;
+}
+.form-input:focus {
+    border-color: #42ccc5;
+    box-shadow: 0 0 0 3px rgba(66, 204, 197, 0.1);
+}
+.submit-button {
+    width: 100%;
+    background: linear-gradient(135deg, #42ccc5 0%, #14b8a6 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0.25rem;
+}
+.submit-button:hover {
+    box-shadow: 0 8px 25px rgba(66, 204, 197, 0.4);
+}
+.submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+    .form-row {
+        flex-direction: column;
+    }
+    .modern-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .modern-register-btn {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let mailEditorReady = false;
+
+    function initMailEditor() {
+        if (mailEditorReady || !window.CKEDITOR || !document.getElementById('email_body')) {
+            return;
+        }
+        if (CKEDITOR.instances.email_body) {
+            mailEditorReady = true;
+            return;
+        }
+
+        CKEDITOR.replace('email_body', {
+            height: 360,
+            removePlugins: 'exportpdf',
+            allowedContent: true,
+            toolbar: [
+                { name: 'document', items: ['Source', '-', 'NewPage', 'Preview'] },
+                { name: 'clipboard', items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'] },
+                { name: 'editing', items: ['Find', 'Replace', '-', 'SelectAll'] },
+                '/',
+                { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'] },
+                { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+                { name: 'links', items: ['Link', 'Unlink'] },
+                { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
+                '/',
+                { name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize'] },
+                { name: 'colors', items: ['TextColor', 'BGColor'] },
+                { name: 'tools', items: ['Maximize', 'ShowBlocks'] }
+            ]
+        });
+
+        mailEditorReady = true;
+    }
+
+    // Tabs
+    document.querySelectorAll('.page-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+
+            if (tab.dataset.tab === 'mail-template') {
+                setTimeout(initMailEditor, 50);
+            }
+        });
+    });
+
+    // Resend email
+    document.querySelectorAll('.resend-mail-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const attendeeId = btn.getAttribute('data-attendee-id');
+            const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+
+            Swal.fire({
+                title: 'Resending...',
+                text: 'Sending confirmation email.',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            fetch(`/admin/attendees/${attendeeId}/resend-email`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrf,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sent',
+                        text: data.message || 'Email resent successfully.',
+                        confirmButtonColor: '#42CCC5'
+                    }).then(() => window.location.reload());
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = 'Resend';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed',
+                        text: data.message || 'Failed to resend email.'
+                    });
+                }
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.textContent = 'Resend';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: 'Failed to resend email.'
+                });
+            });
+        });
+    });
+
+    // Save mail template
+    const mailTemplateForm = document.getElementById('mailTemplateForm');
+    if (mailTemplateForm) {
+        mailTemplateForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            initMailEditor();
+
+            if (window.CKEDITOR && CKEDITOR.instances.email_body) {
+                document.getElementById('email_body').value = CKEDITOR.instances.email_body.getData();
+            }
+
+            const bodyValue = (document.getElementById('email_body').value || '').replace(/<[^>]*>/g, '').trim();
+            if (!bodyValue) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Message required',
+                    text: 'Please enter the email message.'
+                });
+                return;
+            }
+
+            const btn = document.getElementById('saveTemplateBtn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            const formData = new FormData(mailTemplateForm);
+            const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch('{{ route('admin.attendees.mail-template', $bookings->id) }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrf,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.textContent = 'Save Mail Template';
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Saved',
+                        text: data.message || 'Mail template saved successfully.',
+                        confirmButtonColor: '#42CCC5'
+                    }).then(() => window.location.reload());
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to save template.'
+                    });
+                }
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.textContent = 'Save Mail Template';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to save template.'
+                });
+            });
+        });
+    }
+
+    // Register modal
+    const modal = document.getElementById('registerModal');
+    const openBtn = document.getElementById('openRegisterModal');
+    const closeBtn = document.getElementById('closeRegisterModal');
+    const registerForm = document.getElementById('registerForm');
+
+    openBtn.onclick = function () {
+        modal.style.display = 'flex';
+    };
+    closeBtn.onclick = function () {
+        modal.style.display = 'none';
+    };
+    window.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    if (registerForm) {
+        registerForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const sendRegistration = (token) => {
+                if (token) {
+                    const tokenInput = registerForm.querySelector('input[name="_token"]');
+                    if (tokenInput) tokenInput.value = token;
+                    const meta = document.querySelector('meta[name="csrf-token"]');
+                    if (meta) meta.setAttribute('content', token);
+                }
+
+                const formData = new FormData(registerForm);
+                formData.set('registration_time', new Date().toISOString());
+                const csrf = token || (document.querySelector('meta[name="csrf-token"]')
+                    ? document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    : '');
+
+                Swal.fire({
+                    title: 'Registering...',
+                    text: 'Saving attendee and sending confirmation email.',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                modal.style.display = 'none';
+
+                fetch(registerForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrf,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.attendee) {
+                        registerForm.reset();
+                        document.getElementById('department').value = @json(strtoupper(trim(collect([$bookings->company, $bookings->department])->filter()->implode(' / '))));
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Registered',
+                            text: data.email_sent
+                                ? 'Attendee registered and confirmation email sent.'
+                                : 'Attendee registered, but the email could not be sent.',
+                            confirmButtonColor: '#42CCC5'
+                        }).then(() => window.location.reload());
+                    } else {
+                        modal.style.display = 'flex';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Registration failed.'
+                        });
+                    }
+                })
+                .catch(() => {
+                    modal.style.display = 'flex';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Registration failed.'
+                    });
+                });
+            };
+
+            fetch('{{ route('csrf.token') }}', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => sendRegistration(data.token))
+            .catch(() => sendRegistration(null));
+        });
+    }
+});
 </script>
-  </body>
-</html>
+@endsection

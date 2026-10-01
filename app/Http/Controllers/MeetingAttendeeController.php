@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\MeetingAttendee;
 use App\Models\MeetingRoom;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use App\Mail\RegistrationConfirmation;
 use App\Mail\AttendeeRegistered;
 use Illuminate\Support\Str;
@@ -33,10 +34,22 @@ class MeetingAttendeeController extends Controller
         return view('admin.attendee.index', compact('bookings'));
     }
 
-    public function showRegistrationForm($id)
+    public function showRegistrationForm(Request $request, $id)
     {
         $bookings = Booking::with('meetingRoom')->findOrFail($id);
-        return view('admin.attendee.register', compact('bookings'));
+
+        $attendees = $bookings->attendees()
+            ->when($request->search, function ($query) use ($request) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('email', 'like', '%'.$request->search.'%')
+                    ->orWhere('phone', 'like', '%'.$request->search.'%');
+                });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('admin.attendee.register', compact('bookings', 'attendees'));
     }
 
     public function store(Request $request)
@@ -342,8 +355,19 @@ class MeetingAttendeeController extends Controller
                         }
                     }
                 });
+                Log::info('Custom email sent', [
+                    'email' => $recipient,
+                    'subject' => $subject,
+                    'attendee_id' => $attendee->id ?? null,
+                ]);
             } catch (\Exception $e) {
                 $failed[] = $recipient;
+                Log::error('Custom email failed', [
+                    'email' => $recipient,
+                    'subject' => $subject,
+                    'attendee_id' => $attendee->id ?? null,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
         if (count($failed)) {
@@ -402,14 +426,177 @@ class MeetingAttendeeController extends Controller
             'status' => 'not_present',
         ]);
 
+        $emailSent = false;
+        $emailError = null;
+        try {
+            $this->sendRegistrationEmailFromTemplate($attendee);
+            $emailSent = true;
+            $attendee->email_status = 'sent';
+            $attendee->save();
+            Log::info('Registration email sent', [
+                'attendee_id' => $attendee->id,
+                'email' => $attendee->email,
+                'name' => $attendee->name,
+                'meeting_code' => $attendee->meeting_code,
+                'booking_id' => $attendee->booking_id,
+            ]);
+        } catch (\Exception $e) {
+            $emailError = $e->getMessage();
+            $attendee->email_status = 'failed';
+            $attendee->save();
+            Log::error('Registration email failed', [
+                'attendee_id' => $attendee->id,
+                'email' => $attendee->email,
+                'name' => $attendee->name,
+                'meeting_code' => $attendee->meeting_code,
+                'booking_id' => $attendee->booking_id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         return response()->json([
             'success' => true,
+            'email_sent' => $emailSent,
+            'email_error' => $emailError,
             'attendee' => [
                 'name' => $attendee->name,
                 'email' => $attendee->email,
                 'meeting_code' => $attendee->meeting_code,
+                'email_status' => $attendee->email_status,
             ]
         ]);
+    }
+
+    public function resendRegistrationEmail($id)
+    {
+        $attendee = MeetingAttendee::findOrFail($id);
+
+        try {
+            $this->sendRegistrationEmailFromTemplate($attendee);
+            $attendee->email_status = 'sent';
+            $attendee->save();
+
+            Log::info('Registration email resent', [
+                'attendee_id' => $attendee->id,
+                'email' => $attendee->email,
+                'name' => $attendee->name,
+                'meeting_code' => $attendee->meeting_code,
+                'booking_id' => $attendee->booking_id,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email resent successfully.',
+                'email_status' => 'sent',
+            ]);
+        } catch (\Exception $e) {
+            $attendee->email_status = 'failed';
+            $attendee->save();
+
+            Log::error('Registration email resend failed', [
+                'attendee_id' => $attendee->id,
+                'email' => $attendee->email,
+                'name' => $attendee->name,
+                'meeting_code' => $attendee->meeting_code,
+                'booking_id' => $attendee->booking_id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to resend email: ' . $e->getMessage(),
+                'email_status' => 'failed',
+            ], 500);
+        }
+    }
+
+    public function saveMailTemplate(Request $request, $id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        $request->validate([
+            'email_subject' => 'required|string|max:255',
+            'email_body' => 'required|string',
+            'attachments.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx,txt|max:10240',
+            'clear_attachments' => 'nullable|boolean',
+        ]);
+
+        $attachmentPaths = $booking->email_attachment_paths ?? [];
+
+        if ($request->boolean('clear_attachments')) {
+            foreach ($attachmentPaths as $path) {
+                if (\Storage::disk('public')->exists($path)) {
+                    \Storage::disk('public')->delete($path);
+                }
+            }
+            $attachmentPaths = [];
+        }
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $stored = $file->store('mail_templates/' . $booking->id, 'public');
+                $attachmentPaths[] = $stored;
+            }
+        }
+
+        $booking->email_subject = $request->email_subject;
+        $booking->email_body = $request->email_body;
+        $booking->email_attachment_paths = $attachmentPaths;
+        $booking->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mail template saved successfully.',
+            'email_subject' => $booking->email_subject,
+            'email_body' => $booking->email_body,
+            'attachments' => collect($attachmentPaths)->map(function ($path) {
+                return [
+                    'path' => $path,
+                    'name' => basename($path),
+                    'url' => asset('storage/' . $path),
+                ];
+            })->values(),
+        ]);
+    }
+
+    private function sendRegistrationEmailFromTemplate(MeetingAttendee $attendee)
+    {
+        $booking = Booking::find($attendee->booking_id);
+
+        $defaultSubject = 'Meeting Registration Confirmation';
+        $defaultBody = '<p>Hello <b>[Name]</b>,</p>'
+            . '<p>Your registration was successful!</p>'
+            . '<p><b>Your Meeting Code:</b> <span style="color:#42CCC5;">[Meeting Code]</span><br>'
+            . 'Please keep this code safe. You will need it to verify your attendance at the meeting.</p>'
+            . '<p>Best regards,<br><b>CocoaSpace Team</b></p>';
+
+        $subject = ($booking && $booking->email_subject) ? $booking->email_subject : $defaultSubject;
+        $body = ($booking && $booking->email_body) ? $booking->email_body : $defaultBody;
+
+        $personalizedBody = str_replace(
+            ['[Name]', '[Meeting Code]'],
+            [$attendee->name, $attendee->meeting_code],
+            $body
+        );
+
+        $attachmentPaths = ($booking && is_array($booking->email_attachment_paths))
+            ? $booking->email_attachment_paths
+            : [];
+
+        \Mail::send([], [], function ($message) use ($attendee, $subject, $personalizedBody, $attachmentPaths) {
+            $message->to($attendee->email)
+                ->subject($subject)
+                ->html($personalizedBody);
+
+            foreach ($attachmentPaths as $path) {
+                $fullPath = storage_path('app/public/' . $path);
+                if (file_exists($fullPath)) {
+                    $message->attach($fullPath, [
+                        'as' => basename($path),
+                    ]);
+                }
+            }
+        });
     }
 }
 

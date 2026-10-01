@@ -37,7 +37,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<script src="https://cdn.ckeditor.com/4.25.2-lts/standard/ckeditor.js"></script>
 <script>
 const defaultEmailTemplate = `<p>Hello <b>[Name]</b>,</p><p>Your registration was successful!</p><p><b>Your Meeting Code:</b> <span style='color:#42CCC5;'>[Meeting Code]</span><br>Please keep this code safe. You will need it to verify your attendance at the meeting.</p><p>Best regards,<br><b>CocoaSpace Team</b></p>`;
 

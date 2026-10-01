@@ -91,6 +91,8 @@ Route::get('/admin/attendees/export-pdf/{id}', [MeetingAttendeeController::class
 
     Route::post('/admin/attendees/send-custom-email', [App\Http\Controllers\MeetingAttendeeController::class, 'sendCustomEmail'])->name('attendees.sendCustomEmail');
     Route::post('/admin/attendees/register-ajax', [App\Http\Controllers\MeetingAttendeeController::class, 'registerAjax']);
+    Route::post('/admin/attendees/{id}/mail-template', [MeetingAttendeeController::class, 'saveMailTemplate'])->name('admin.attendees.mail-template');
+    Route::post('/admin/attendees/{id}/resend-email', [MeetingAttendeeController::class, 'resendRegistrationEmail'])->name('admin.attendees.resend-email');
 });
 Route::post('/register/attendees/verify', [App\Http\Controllers\MeetingAttendeeController::class, 'verify'])->name('register.attendees.verify');
 
